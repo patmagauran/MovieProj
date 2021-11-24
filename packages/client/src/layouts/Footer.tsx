@@ -1,5 +1,6 @@
-/** @jsx jsx */
-import { css, jsx } from '@emotion/react';
+/** @jsxImportSource @emotion/react */
+
+import { css } from '@emotion/react';
 import { ReactComponent as GithubIcon } from '../assets/github.svg';
 
 const footerStyle = css`
