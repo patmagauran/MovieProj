@@ -4665,6 +4665,101 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@fullcalendar/common", [
+        ["npm:5.10.1", {
+          "packageLocation": "./.yarn/cache/@fullcalendar-common-npm-5.10.1-de316fd4fd-ac5ad04c9a.zip/node_modules/@fullcalendar/common/",
+          "packageDependencies": [
+            ["@fullcalendar/common", "npm:5.10.1"],
+            ["tslib", "npm:2.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@fullcalendar/daygrid", [
+        ["npm:5.10.1", {
+          "packageLocation": "./.yarn/cache/@fullcalendar-daygrid-npm-5.10.1-17bfd14d8e-005e8e829a.zip/node_modules/@fullcalendar/daygrid/",
+          "packageDependencies": [
+            ["@fullcalendar/daygrid", "npm:5.10.1"],
+            ["@fullcalendar/common", "npm:5.10.1"],
+            ["tslib", "npm:2.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@fullcalendar/interaction", [
+        ["npm:5.10.1", {
+          "packageLocation": "./.yarn/cache/@fullcalendar-interaction-npm-5.10.1-a4eae0d366-5a90bcee3a.zip/node_modules/@fullcalendar/interaction/",
+          "packageDependencies": [
+            ["@fullcalendar/interaction", "npm:5.10.1"],
+            ["@fullcalendar/common", "npm:5.10.1"],
+            ["tslib", "npm:2.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@fullcalendar/premium-common", [
+        ["npm:5.10.1", {
+          "packageLocation": "./.yarn/cache/@fullcalendar-premium-common-npm-5.10.1-aeac677b5c-98e8a7b7db.zip/node_modules/@fullcalendar/premium-common/",
+          "packageDependencies": [
+            ["@fullcalendar/premium-common", "npm:5.10.1"],
+            ["@fullcalendar/common", "npm:5.10.1"],
+            ["tslib", "npm:2.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@fullcalendar/react", [
+        ["npm:5.10.1", {
+          "packageLocation": "./.yarn/cache/@fullcalendar-react-npm-5.10.1-738161fb06-9c5f4b4492.zip/node_modules/@fullcalendar/react/",
+          "packageDependencies": [
+            ["@fullcalendar/react", "npm:5.10.1"]
+          ],
+          "linkType": "SOFT",
+        }],
+        ["virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:5.10.1", {
+          "packageLocation": "./.yarn/__virtual__/@fullcalendar-react-virtual-e37e13cc7c/0/cache/@fullcalendar-react-npm-5.10.1-738161fb06-9c5f4b4492.zip/node_modules/@fullcalendar/react/",
+          "packageDependencies": [
+            ["@fullcalendar/react", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:5.10.1"],
+            ["@fullcalendar/common", "npm:5.10.1"],
+            ["@types/react", "npm:17.0.36"],
+            ["@types/react-dom", "npm:17.0.11"],
+            ["react", "npm:17.0.2"],
+            ["react-dom", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:17.0.2"],
+            ["tslib", "npm:2.3.1"]
+          ],
+          "packagePeers": [
+            "@types/react-dom",
+            "@types/react",
+            "react-dom",
+            "react"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@fullcalendar/scrollgrid", [
+        ["npm:5.10.1", {
+          "packageLocation": "./.yarn/cache/@fullcalendar-scrollgrid-npm-5.10.1-78dd6ca16f-ee75688bc2.zip/node_modules/@fullcalendar/scrollgrid/",
+          "packageDependencies": [
+            ["@fullcalendar/scrollgrid", "npm:5.10.1"],
+            ["@fullcalendar/common", "npm:5.10.1"],
+            ["@fullcalendar/premium-common", "npm:5.10.1"],
+            ["tslib", "npm:2.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@fullcalendar/timegrid", [
+        ["npm:5.10.1", {
+          "packageLocation": "./.yarn/cache/@fullcalendar-timegrid-npm-5.10.1-cdcf9d0852-4fc0fc907d.zip/node_modules/@fullcalendar/timegrid/",
+          "packageDependencies": [
+            ["@fullcalendar/timegrid", "npm:5.10.1"],
+            ["@fullcalendar/common", "npm:5.10.1"],
+            ["@fullcalendar/daygrid", "npm:5.10.1"],
+            ["tslib", "npm:2.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@gar/promisify", [
         ["npm:1.1.2", {
           "packageLocation": "./.yarn/cache/@gar-promisify-npm-1.1.2-2343f94380-d05081e088.zip/node_modules/@gar/promisify/",
@@ -8863,6 +8958,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["client", "workspace:packages/client"],
             ["@emotion/react", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:11.6.0"],
             ["@emotion/styled", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:11.6.0"],
+            ["@fullcalendar/daygrid", "npm:5.10.1"],
+            ["@fullcalendar/interaction", "npm:5.10.1"],
+            ["@fullcalendar/react", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:5.10.1"],
+            ["@fullcalendar/scrollgrid", "npm:5.10.1"],
+            ["@fullcalendar/timegrid", "npm:5.10.1"],
             ["@mui/icons-material", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:5.2.0"],
             ["@mui/material", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:5.2.0"],
             ["@mui/styles", "virtual:658502eb4296e93abedc18b6aa9b26978f434f08d98e21ebb0e725354b8bb54b62db9c4a1893e460c694ff7500ff5cbafa4457b0dfd26b5838868666c861e990#npm:5.2.0"],

@@ -4,7 +4,7 @@ import React from "react";
 import { css } from "@emotion/react";
 import { Box, Typography } from "@mui/material";
 import MovieList from "../components/MovieList";
-
+import SingleSchedule from "../components/Schedules/SingleSchedule";
 const SettingsPageStyle = css`
   h1 {
     font-size: 5rem;
@@ -29,6 +29,7 @@ const SettingsPage = () => {
         edit their personal information. It will likely be a 7 lists(one for
         each day) that you can add to via a dialog with start/end times
       </Typography>
+      <SingleSchedule />
     </Box>
   );
 };

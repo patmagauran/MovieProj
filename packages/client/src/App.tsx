@@ -1,4 +1,5 @@
 import React from "react";
+import { blueGrey, grey } from "@mui/material/colors";
 
 import Routes from "./routes";
 import AppLayout from "./layouts/AppLayout";
@@ -23,6 +24,17 @@ export default function ToggleColorMode() {
       createTheme({
         palette: {
           mode,
+          ...(mode === "light"
+            ? {}
+            : {
+                background: {
+                  default: "#292929",
+                  paper: "#414141",
+                },
+                text: {
+                  primary: grey.A100,
+                },
+              }),
         },
       }),
     [mode]

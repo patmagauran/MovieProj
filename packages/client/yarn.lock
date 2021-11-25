@@ -1779,6 +1779,80 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fullcalendar/common@npm:~5.10.1":
+  version: 5.10.1
+  resolution: "@fullcalendar/common@npm:5.10.1"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: ac5ad04c9ade350ad51a87146ba6c5e679e74c237229ced8057e3a4cc6af9ab93894375c8004beff6f45594bca73ed13763b91604c2b9851b78810dcd991729e
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/daygrid@npm:^5.10.1, @fullcalendar/daygrid@npm:~5.10.1":
+  version: 5.10.1
+  resolution: "@fullcalendar/daygrid@npm:5.10.1"
+  dependencies:
+    "@fullcalendar/common": ~5.10.1
+    tslib: ^2.1.0
+  checksum: 005e8e829a47eb49bcb6c9cd66a32e0b6b0a371f4554dfe67396818d26c109669cb91bb87c4d17f371aad82d27dadd272a11d19c5291795063a0c2edd912936f
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/interaction@npm:^5.10.1":
+  version: 5.10.1
+  resolution: "@fullcalendar/interaction@npm:5.10.1"
+  dependencies:
+    "@fullcalendar/common": ~5.10.1
+    tslib: ^2.1.0
+  checksum: 5a90bcee3a704fca10c08cc3b96269a9b9c9a7268668947fb42abc48dace81c2b79b9f45440a6c07f57d335734c4c00cc84d02d2a08b97ff646fbc44977de8fd
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/premium-common@npm:~5.10.1":
+  version: 5.10.1
+  resolution: "@fullcalendar/premium-common@npm:5.10.1"
+  dependencies:
+    "@fullcalendar/common": ~5.10.1
+    tslib: ^2.1.0
+  checksum: 98e8a7b7dbc7ee5f6b3551e08d5047876b3ee35d332ba6bad8e43b6e37cec98dd6081f4e861df00bffcba1b9434fec8cf577d4ac4c405c1ecc20f4641536429b
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/react@npm:^5.10.1":
+  version: 5.10.1
+  resolution: "@fullcalendar/react@npm:5.10.1"
+  dependencies:
+    "@fullcalendar/common": ~5.10.1
+    tslib: ^2.1.0
+  peerDependencies:
+    react: ^16.7.0 || ^17
+    react-dom: ^16.7.0 || ^17
+  checksum: 9c5f4b449297107cf6a19556994f77d060b7fb96c3028a5a27a09f7abbe478a7f2aa2a41f094864625dec3eb080f12b37534dffe0962dba51519ff5dc528fb96
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/scrollgrid@npm:^5.10.1":
+  version: 5.10.1
+  resolution: "@fullcalendar/scrollgrid@npm:5.10.1"
+  dependencies:
+    "@fullcalendar/common": ~5.10.1
+    "@fullcalendar/premium-common": ~5.10.1
+    tslib: ^2.1.0
+  checksum: ee75688bc286b0a8386459d94fe4a0ad272103bd38b5930f43136c453cef9c4116db988db5b5edf79c78dac4b2e29d798c33d66ad5745c004eee1bc9c9cbb65a
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/timegrid@npm:^5.10.1":
+  version: 5.10.1
+  resolution: "@fullcalendar/timegrid@npm:5.10.1"
+  dependencies:
+    "@fullcalendar/common": ~5.10.1
+    "@fullcalendar/daygrid": ~5.10.1
+    tslib: ^2.1.0
+  checksum: 4fc0fc907dfbe4f24a9ca5938d473968f1fba9f840fd5b9d0003e18c603a5079e327f03c86fb25cf2686a59104ab5b7be3a11489c9f93c361ffbe87e98e296e3
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.0.1":
   version: 1.1.2
   resolution: "@gar/promisify@npm:1.1.2"
@@ -4953,6 +5027,11 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.6.0
     "@emotion/styled": ^11.6.0
+    "@fullcalendar/daygrid": ^5.10.1
+    "@fullcalendar/interaction": ^5.10.1
+    "@fullcalendar/react": ^5.10.1
+    "@fullcalendar/scrollgrid": ^5.10.1
+    "@fullcalendar/timegrid": ^5.10.1
     "@mui/icons-material": ^5.2.0
     "@mui/material": ^5.2.0
     "@mui/styles": ^5.2.0
@@ -15171,6 +15250,13 @@ __metadata:
   version: 2.1.0
   resolution: "tslib@npm:2.1.0"
   checksum: aa189c8179de0427b0906da30926fd53c59d96ec239dff87d6e6bc831f608df0cbd6f77c61dabc074408bd0aa0b9ae4ec35cb2c15f729e32f37274db5730cb78
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.1.0":
+  version: 2.3.1
+  resolution: "tslib@npm:2.3.1"
+  checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
   languageName: node
   linkType: hard
 
