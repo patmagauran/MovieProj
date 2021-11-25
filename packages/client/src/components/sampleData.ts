@@ -1,4 +1,15 @@
-export default [
+export interface movieRow {
+  title: string,
+  year: string | number,
+  runtime: number,
+  genre: string,
+  rating: number,
+  id: number,
+  priority: number,
+  WantToSee?: boolean,
+  HaveSeen?: boolean
+}
+const sampleData : movieRow[] = [
  {
    "title": "Hide and Seek",
    "year": 1913,
@@ -351,3 +362,5 @@ export default [
    "priority": 54
  }
 ]
+
+export default sampleData;
