@@ -11,16 +11,28 @@ const AppLayout: React.FC<{}> = ({ children }) => {
     <Box
       sx={{
         width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
+
         bgcolor: "background.default",
         color: "text.primary",
+        height: "100vh",
         borderRadius: 0,
-        p: 3,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Header />
-      <Box>{children}</Box>
+      <Box
+        sx={{
+          maxWidth: "1280px",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignSelf: "center",
+        }}
+      >
+        {children}
+      </Box>
       <Footer />
     </Box>
   );

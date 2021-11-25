@@ -28,7 +28,9 @@ const Footer = () => {
   const match = paths.findIndex((path) => matchPath(path, location.pathname));
   return (
     <Paper
-      sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+      sx={{
+        marginTop: "10px",
+      }}
       elevation={3}
     >
       <BottomNavigation showLabels value={match}>

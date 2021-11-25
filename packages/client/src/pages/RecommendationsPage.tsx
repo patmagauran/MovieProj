@@ -1,7 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
-import React from 'react';
-import { css } from '@emotion/react';
+import React from "react";
+import { css } from "@emotion/react";
+import MovieList from "../components/MovieList";
+import { Box, Typography } from "@mui/material";
 
 const RecommendationPageStyle = css`
   h1 {
@@ -13,9 +15,17 @@ const RecommendationPageStyle = css`
 
 const RecommendationPage = () => {
   return (
-    <div css={[RecommendationPageStyle]}>
-      <h1 className="title">Hello Recommendations!</h1>
-    </div>
+    <Box
+      height="100%"
+      alignContent="center"
+      display="flex"
+      flexDirection="column"
+    >
+      <Typography variant="h3" textAlign="center">
+        Explore the Recommendations!
+      </Typography>
+      <MovieList />
+    </Box>
   );
 };
 

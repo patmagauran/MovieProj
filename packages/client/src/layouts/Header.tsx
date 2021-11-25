@@ -3,6 +3,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { css } from "@emotion/react";
 import { useTheme } from "@mui/material/styles";
+import { Paper } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 
 import { ReactComponent as LogoIcon } from "../assets/zap.svg";
@@ -23,7 +24,6 @@ const headerStyle = (isLight: boolean) => css`
     display: flex;
     padding: 0 12px;
     margin: 0 auto;
-    max-width: 1280px;
     align-items: center;
     justify-content: space-between;
 
@@ -62,26 +62,27 @@ const Header = () => {
   const theme = useTheme();
   const isLight = theme.palette.mode === "light";
   return (
-    <header css={[headerStyle(isLight)]}>
-      <nav>
-        <div className="logo">
-          <Link to="/" replace={pathname === "/"}>
-            <LogoIcon />
-            brand
-          </Link>
-        </div>
-        <div>
-          {theme.palette.mode} mode
-          <IconButton
-            sx={{ ml: 1 }}
-            onClick={colorMode.toggleColorMode}
-            color="inherit"
-          >
-            {theme.palette.mode === "dark" ? <MoonIcon /> : <SunIcon />}
-          </IconButton>
-        </div>
-      </nav>
-    </header>
+    <Paper elevation={3}>
+      <header css={[headerStyle(isLight)]}>
+        <nav>
+          <div className="logo">
+            <Link to="/" replace={pathname === "/"}>
+              <LogoIcon />
+              Movie Finder
+            </Link>
+          </div>
+          <div>
+            <IconButton
+              sx={{ ml: 1 }}
+              onClick={colorMode.toggleColorMode}
+              color="inherit"
+            >
+              {theme.palette.mode === "dark" ? <MoonIcon /> : <SunIcon />}
+            </IconButton>
+          </div>
+        </nav>
+      </header>
+    </Paper>
   );
 };
 
