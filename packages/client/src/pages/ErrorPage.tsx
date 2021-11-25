@@ -1,12 +1,12 @@
 /** @jsxImportSource @emotion/react */
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { css } from '@emotion/react';
-import { default as TakenSVG } from '../assets/undraw_Taken.svg';
-import { palette } from '../styles/palette';
-import { useThemeContext } from '../contexts/ThemeContext';
-import media from '../styles/media';
+import React from "react";
+import { Link } from "react-router-dom";
+import { css } from "@emotion/react";
+import { default as TakenSVG } from "../assets/undraw_Taken.svg";
+import { palette } from "../styles/palette";
+import media from "../styles/media";
+import { useTheme } from "@mui/material/styles";
 
 const ErrorPageStyle = (isLight: boolean) => css`
   flex: 1;
@@ -47,8 +47,8 @@ const ErrorPageStyle = (isLight: boolean) => css`
 `;
 
 const ErrorPage = () => {
-  const { isLight } = useThemeContext();
-
+  const theme = useTheme();
+  const isLight = theme.palette.mode === "light";
   return (
     <div css={[ErrorPageStyle(isLight)]}>
       <h1>Page Not Found.</h1>

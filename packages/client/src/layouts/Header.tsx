@@ -1,16 +1,18 @@
 /** @jsxImportSource @emotion/react */
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { css } from '@emotion/react';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { css } from "@emotion/react";
+import { useTheme } from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
 
-import { ReactComponent as LogoIcon } from '../assets/zap.svg';
-import { ReactComponent as SunIcon } from '../assets/sun.svg';
-import { ReactComponent as MoonIcon } from '../assets/moon.svg';
-import media from '../styles/media';
-import { palette } from '../styles/palette';
-import { useThemeContext } from '../contexts/ThemeContext';
+import { ReactComponent as LogoIcon } from "../assets/zap.svg";
+import { ReactComponent as SunIcon } from "../assets/sun.svg";
+import { ReactComponent as MoonIcon } from "../assets/moon.svg";
+import media from "../styles/media";
+import { palette } from "../styles/palette";
+import ColorModeContext from "../contexts/ColorModeContext";
 
-const headerStyle = (isLight:boolean) => css`
+const headerStyle = (isLight: boolean) => css`
   height: 60px;
   ${media.medium} {
     height: 50px;
@@ -42,7 +44,7 @@ const headerStyle = (isLight:boolean) => css`
     }
 
     svg {
-      color: ${isLight ? 'inherit' : palette.yellow[4]};
+      color: ${isLight ? "inherit" : palette.yellow[4]};
       fill: ${isLight ? palette.yellow[6] : palette.yellow[4]};
     }
 
@@ -56,23 +58,27 @@ const headerStyle = (isLight:boolean) => css`
 
 const Header = () => {
   const { pathname } = useLocation();
-  const { isLight, toggleTheme } = useThemeContext();
-
+  const colorMode = React.useContext(ColorModeContext);
+  const theme = useTheme();
+  const isLight = theme.palette.mode === "light";
   return (
     <header css={[headerStyle(isLight)]}>
       <nav>
         <div className="logo">
-          <Link to="/" replace={pathname === '/'}>
+          <Link to="/" replace={pathname === "/"}>
             <LogoIcon />
             brand
           </Link>
         </div>
         <div>
-          {isLight ? (
-            <SunIcon className="theme" onClick={toggleTheme} />
-          ) : (
-            <MoonIcon className="theme" onClick={toggleTheme} />
-          )}
+          {theme.palette.mode} mode
+          <IconButton
+            sx={{ ml: 1 }}
+            onClick={colorMode.toggleColorMode}
+            color="inherit"
+          >
+            {theme.palette.mode === "dark" ? <MoonIcon /> : <SunIcon />}
+          </IconButton>
         </div>
       </nav>
     </header>

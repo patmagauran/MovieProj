@@ -1,35 +1,28 @@
-import React from 'react';
-import { Global, css } from '@emotion/react';
+import React from "react";
+import { Global, css } from "@emotion/react";
 
-import Header from './Header';
-import Footer from './Footer';
+import Header from "./Header";
+import Footer from "./Footer";
 
-import colorMap from '../styles/palette';
-import { useThemeContext } from '../contexts/ThemeContext';
-
-const globalStyle = (theme : string) => css`
-  body {
-    ${colorMap.base[theme]}
-    transition-duration: 0.3s;
-    transition-timing-function: ease;
-    transition-property: border, background, color;
-  }
-  main {
-    margin: 0 auto;
-    max-width: 1280px;
-  }
-`;
+import Box from "@mui/material/Box";
 
 const AppLayout: React.FC<{}> = ({ children }) => {
-  const { theme } = useThemeContext();
-
   return (
-    <>
-      <Global styles={[globalStyle(theme)]} />
+    <Box
+      sx={{
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "background.default",
+        color: "text.primary",
+        borderRadius: 0,
+        p: 3,
+      }}
+    >
       <Header />
-      <main>{children}</main>
+      <Box>{children}</Box>
       <Footer />
-    </>
+    </Box>
   );
 };
 
