@@ -7,6 +7,10 @@ const pool = new Pool({
   port: 5432,
 });
 
+export const getClient = async () => {
+  return pool.connect();
+};
+
 export const query = async (text: any, params?: any) => {
   const start = Date.now();
 
