@@ -7743,6 +7743,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"express-promise-router@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "express-promise-router@npm:4.1.0"
+  dependencies:
+    is-promise: ^4.0.0
+    lodash.flattendeep: ^4.0.0
+    methods: ^1.0.0
+  peerDependencies:
+    "@types/express": ^4.0.0
+    express: ^4.0.0
+  peerDependenciesMeta:
+    "@types/express":
+      optional: true
+  checksum: 7ef79842891b12262c0b9beea10b24e3199d4c2005de7c4ab1d4bb0a8b2d877af50c9b165a901859eb6e68c6b336e1bdf4d54851f2bd0ac272c5d3a6101d2957
+  languageName: node
+  linkType: hard
+
 "express@npm:^4.17.1":
   version: 4.17.1
   resolution: "express@npm:4.17.1"
@@ -9582,6 +9599,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-promise@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "is-promise@npm:4.0.0"
+  checksum: 0b46517ad47b00b6358fd6553c83ec1f6ba9acd7ffb3d30a0bf519c5c69e7147c132430452351b8a9fc198f8dd6c4f76f8e6f5a7f100f8c77d57d9e0f4261a8a
+  languageName: node
+  linkType: hard
+
 "is-property@npm:^1.0.2":
   version: 1.0.2
   resolution: "is-property@npm:1.0.2"
@@ -10888,6 +10912,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.flattendeep@npm:^4.0.0":
+  version: 4.4.0
+  resolution: "lodash.flattendeep@npm:4.4.0"
+  checksum: 8521c919acac3d4bcf0aaf040c1ca9cb35d6c617e2d72e9b4d51c9a58b4366622cd6077441a18be626c3f7b28227502b3bf042903d447b056ee7e0b11d45c722
+  languageName: node
+  linkType: hard
+
 "lodash.includes@npm:^4.3.0":
   version: 4.3.0
   resolution: "lodash.includes@npm:4.3.0"
@@ -11212,7 +11243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"methods@npm:~1.1.2":
+"methods@npm:^1.0.0, methods@npm:~1.1.2":
   version: 1.1.2
   resolution: "methods@npm:1.1.2"
   checksum: 0917ff4041fa8e2f2fda5425a955fe16ca411591fbd123c0d722fcf02b73971ed6f764d85f0a6f547ce49ee0221ce2c19a5fa692157931cecb422984f1dcd13a
@@ -15088,6 +15119,7 @@ __metadata:
     "@types/pg-copy-streams": ^1.2.1
     body-parser: ^1.19.0
     express: ^4.17.1
+    express-promise-router: ^4.1.0
     mssql: ^7.3.0
     mysql2: ^2.3.3
     pg: ^8.7.1

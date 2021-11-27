@@ -1,0 +1,11 @@
+{
+  "configurations": [
+    {
+      "type": "node-terminal",
+      "name": "Run Script: server",
+      "request": "launch",
+      "command": "yarn run server",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

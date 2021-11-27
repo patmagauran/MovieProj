@@ -11698,6 +11698,31 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["express-promise-router", [
+        ["npm:4.1.0", {
+          "packageLocation": "./.yarn/cache/express-promise-router-npm-4.1.0-c2ec0ecfb5-7ef7984289.zip/node_modules/express-promise-router/",
+          "packageDependencies": [
+            ["express-promise-router", "npm:4.1.0"]
+          ],
+          "linkType": "SOFT",
+        }],
+        ["virtual:2499dbb93d824027565d71b0716c4fb8b548ad61955d0a0286bfb3c5b4058e227894b6691d96808c00f576db14870018375210362c26ee321ea99fd6ed041c74#npm:4.1.0", {
+          "packageLocation": "./.yarn/__virtual__/express-promise-router-virtual-fc8b921f76/0/cache/express-promise-router-npm-4.1.0-c2ec0ecfb5-7ef7984289.zip/node_modules/express-promise-router/",
+          "packageDependencies": [
+            ["express-promise-router", "virtual:2499dbb93d824027565d71b0716c4fb8b548ad61955d0a0286bfb3c5b4058e227894b6691d96808c00f576db14870018375210362c26ee321ea99fd6ed041c74#npm:4.1.0"],
+            ["@types/express", "npm:4.17.13"],
+            ["express", "npm:4.17.1"],
+            ["is-promise", "npm:4.0.0"],
+            ["lodash.flattendeep", "npm:4.4.0"],
+            ["methods", "npm:1.1.2"]
+          ],
+          "packagePeers": [
+            "@types/express",
+            "express"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["ext", [
         ["npm:1.6.0", {
           "packageLocation": "./.yarn/cache/ext-npm-1.6.0-d724ecc103-ca3ef4619e.zip/node_modules/ext/",
@@ -13727,6 +13752,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["is-promise", [
+        ["npm:4.0.0", {
+          "packageLocation": "./.yarn/cache/is-promise-npm-4.0.0-1e3c05420c-0b46517ad4.zip/node_modules/is-promise/",
+          "packageDependencies": [
+            ["is-promise", "npm:4.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["is-property", [
         ["npm:1.0.2", {
           "packageLocation": "./.yarn/cache/is-property-npm-1.0.2-6eac53b30e-33b661a369.zip/node_modules/is-property/",
@@ -15167,6 +15201,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/lodash.debounce-npm-4.0.8-f1d6e09799-a3f527d22c.zip/node_modules/lodash.debounce/",
           "packageDependencies": [
             ["lodash.debounce", "npm:4.0.8"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["lodash.flattendeep", [
+        ["npm:4.4.0", {
+          "packageLocation": "./.yarn/cache/lodash.flattendeep-npm-4.4.0-26b2b4cbd7-8521c919ac.zip/node_modules/lodash.flattendeep/",
+          "packageDependencies": [
+            ["lodash.flattendeep", "npm:4.4.0"]
           ],
           "linkType": "HARD",
         }]
@@ -19934,6 +19977,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/pg-copy-streams", "npm:1.2.1"],
             ["body-parser", "npm:1.19.0"],
             ["express", "npm:4.17.1"],
+            ["express-promise-router", "virtual:2499dbb93d824027565d71b0716c4fb8b548ad61955d0a0286bfb3c5b4058e227894b6691d96808c00f576db14870018375210362c26ee321ea99fd6ed041c74#npm:4.1.0"],
             ["mssql", "npm:7.3.0"],
             ["mysql2", "npm:2.3.3"],
             ["pg", "virtual:2499dbb93d824027565d71b0716c4fb8b548ad61955d0a0286bfb3c5b4058e227894b6691d96808c00f576db14870018375210362c26ee321ea99fd6ed041c74#npm:8.7.1"],
