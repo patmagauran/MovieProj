@@ -6,6 +6,7 @@ const pool = new Pool({
   password: "MovieProj",
   port: 5432,
 });
+export const sql = (strings: TemplateStringsArray) => (String.raw(strings));
 
 export const getClient = async () => {
   return pool.connect();

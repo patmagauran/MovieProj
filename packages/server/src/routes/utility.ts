@@ -1,5 +1,6 @@
 import Router from "express-promise-router";
 import * as db from "../db";
+import { sql } from "../db";
 import { from as copyFrom } from "pg-copy-streams";
 import fs from "fs";
 const router = Router();
@@ -47,13 +48,13 @@ router.get("/import", async (request: any, response: any) => {
     console.log("Running Import");
     await client.query("BEGIN");
     await client.query(
-      'CREATE TEMP TABLE "import_test" (LIKE movie_basics INCLUDING GENERATED INCLUDING IDENTITY)'
+      sql`CREATE TEMP TABLE "import_test" (LIKE movie_basics INCLUDING GENERATED INCLUDING IDENTITY)`
     );
     console.log("Created Temporary Table. Copying Data In.");
 
     var stream = client.query(
       copyFrom(
-        `COPY "import_test" 
+        sql`COPY "import_test" 
           (tconst, title_type, primary_title, 
           original_title, is_adult, start_year, 
           end_year, runtime_minutes, genres) 
@@ -69,18 +70,31 @@ router.get("/import", async (request: any, response: any) => {
     console.log("Data ready for insert. Insertting data into primary table.");
 
     await client.query(
-      `
-      INSERT INTO movie_basics 
-        (tconst, title_type, primary_title, 
-        original_title, is_adult, start_year, 
-        end_year, runtime_minutes, genres)
-      (SELECT tconst, title_type, primary_title, 
-        original_title, is_adult, start_year, 
-        end_year, runtime_minutes, genres FROM import_test)
-      ON CONFLICT(tconst) DO UPDATE
-        SET "title_type"=EXCLUDED.title_type, "primary_title"=EXCLUDED.primary_title,
-          "original_title"=EXCLUDED.original_title, "is_adult"=EXCLUDED.is_adult, "start_year"=EXCLUDED.start_year,
-          "end_year"=EXCLUDED.end_year, "runtime_minutes"=EXCLUDED.runtime_minutes, genres=EXCLUDED.genres
+      sql`
+        INSERT INTO movie_basics 
+        (tconst, title_type, primary_title, original_title, is_adult, start_year, end_year, runtime_minutes, genres)
+         (SELECT
+            tconst,
+            title_type,
+            primary_title,
+            original_title,
+            is_adult,
+            start_year,
+            end_year,
+            runtime_minutes,
+            genres
+          FROM
+            import_test)
+        ON CONFLICT (tconst)
+          DO UPDATE SET
+            "title_type" = EXCLUDED.title_type,
+            "primary_title" = EXCLUDED.primary_title,
+            "original_title" = EXCLUDED.original_title,
+            "is_adult" = EXCLUDED.is_adult,
+            "start_year" = EXCLUDED.start_year,
+            "end_year" = EXCLUDED.end_year,
+            "runtime_minutes" = EXCLUDED.runtime_minutes,
+            genres = EXCLUDED.genres
       `
     );
     console.log("Saving Changes");
