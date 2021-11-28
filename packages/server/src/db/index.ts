@@ -2,7 +2,7 @@ import { Pool, QueryArrayResult } from "pg";
 const pool = new Pool({
   user: "MovieProjApp",
   host: "localhost",
-  database: "apiTest",
+  database: "MovieProj",
   password: "MovieProj",
   port: 5432,
 });
