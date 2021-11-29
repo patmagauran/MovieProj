@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import {
   DataGrid,
   GridRowsProp,
@@ -18,13 +19,6 @@ import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 const initialRows: GridRowsProp = sampleData;
 
-const columns: GridColDef[] = [
-  { field: "title", headerName: "English Title", flex: 1 },
-  { field: "genre", headerName: "Genres", flex: 1 },
-  { field: "rating", headerName: "IMDB Rating", flex: 1 },
-  { field: "priority", headerName: "Priority Number", flex: 1 },
-  { field: "runtime", headerName: "Runtime", flex: 1 },
-];
 const useStyles = makeStyles({
   root: {
     display: "flex",
@@ -46,9 +40,48 @@ function CustomPagination() {
     />
   );
 }
+function loadServerRows(page: number): Promise<any> {
+  return new Promise<any>((resolve) => {
+    axios
+      .get("http://localhost:8080/movies", {
+        params: {
+          page: page,
+          pageSize: 25,
+        },
+      })
+      .then((response) => {
+        resolve(response.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+}
 export default function MovieList() {
-  const [rows, setRows] = React.useState(sampleData);
+  //  const [rows, setRows] = React.useState(sampleData);
+  const [page, setPage] = React.useState(0);
+  const [rows, setRows] = React.useState<GridRowsProp>([]);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
+  React.useEffect(() => {
+    let active = true;
+
+    (async () => {
+      setLoading(true);
+      const newRows = await loadServerRows(page);
+
+      if (!active) {
+        return;
+      }
+
+      setRows(newRows);
+      setLoading(false);
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [page]);
   const AddMovieToWatchlist = React.useCallback(
     (id: GridRowId) => () => {
       setRows((prevRows) =>
@@ -75,10 +108,10 @@ export default function MovieList() {
 
   const columns = React.useMemo(
     () => [
-      { field: "title", headerName: "English Title", flex: 1 },
+      { field: "english_title", headerName: "English Title", flex: 1 },
       { field: "genre", headerName: "Genres", flex: 1 },
-      { field: "rating", headerName: "IMDB Rating", flex: 1 },
-      { field: "priority", headerName: "Priority Number", flex: 1 },
+      { field: "imdb_rating", headerName: "IMDB Rating", flex: 1 },
+      { field: "see_score", headerName: "Priority Number", flex: 1 },
       { field: "runtime", headerName: "Runtime", flex: 1 },
       {
         field: "actions",
@@ -113,13 +146,16 @@ export default function MovieList() {
       <div style={{ display: "flex", height: "100%" }}>
         <div style={{ flexGrow: 1 }}>
           <DataGrid
-            pagination
-            autoPageSize
             rows={rows}
             columns={columns}
+            pageSize={25}
+            rowsPerPageOptions={[25]}
+            rowCount={100}
+            paginationMode="server"
+            onPageChange={(newPage) => setPage(newPage)}
+            loading={loading}
             components={{
               Toolbar: GridToolbar,
-              Pagination: CustomPagination,
             }}
           />
         </div>

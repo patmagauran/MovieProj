@@ -5,7 +5,13 @@ const router = Router();
 
 //LIST
 router.get("/", async (request: any, response: any) => {
-  db.restQuery(response, sql`SELECT * FROM users ORDER BY id ASC`);
+  let pageSize = request.query.pageSize ?? 10;
+  let page = request.query.page ?? 0;
+  let offset = (page) * pageSize;
+  db.restQuery(response, sql`SELECT * FROM movies 
+  ORDER BY id ASC 
+  LIMIT ${pageSize}
+  OFFSET ${offset}`);
 });
 //GET
 router.get("/:id", async (request: any, response: any) =>

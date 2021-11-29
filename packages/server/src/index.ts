@@ -1,10 +1,13 @@
 // ./app.js
 import express from "express";
 import mountRoutes from "./routes";
+import cors from "cors"
 try {
   const app = express();
   const port = 8080; // default port to listen
-
+  app.use(cors({
+    origin: 'http://localhost:3000'
+  }))
   app.use(express.json()); //Used to parse JSON bodies
   app.use(express.urlencoded()); //Parse URL-encoded bodies
 

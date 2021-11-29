@@ -57,7 +57,7 @@ async function insertMovies(client: PoolClient) {
 
   var stream = client.query(
     copyFrom(
-      sql`COPY "import_temp"
+      /* sql */`COPY "import_temp"
           (tconst, title_type, primary_title, 
           original_title, is_adult, start_year, 
           end_year, runtime_minutes, genres) 
@@ -142,7 +142,7 @@ async function addRatings(client: PoolClient) {
 
   var stream = client.query(
     copyFrom(
-      sql`COPY "import_temp"
+      /* sql */`COPY "import_temp"
           (tconst, average_rating, num_votes) 
           FROM STDIN`
     )
@@ -183,7 +183,7 @@ async function insertPeople(client: PoolClient) {
 
   var stream = client.query(
     copyFrom(
-      sql`COPY "import_temp"
+      /* sql */`COPY "import_temp"
           (nconst, primary_name, birth_year, death_year,
           primary_profession, known_for) 
           FROM STDIN`
@@ -231,7 +231,7 @@ async function insertCastAndCrew(client: PoolClient) {
 
   var stream = client.query(
     copyFrom(
-      sql`COPY "import_temp"
+      /* sql */`COPY "import_temp"
           (tconst, ordering, nconst, category, job, characters) 
           FROM STDIN`
     )
@@ -286,7 +286,7 @@ async function insertCastAndCrew(client: PoolClient) {
   console.log("Saving Changes - Stage 3");
   await client.query("DROP TABLE import_temp; COMMIT;");
 }
-
+//ADD GROUO BASED AVAILABILITY
 router.get("/import", async (request: any, response: any) => {
   // note: we don't try/catch this because if connecting throws an exception
   // we don't need to dispose of the client (it will be undefined)
