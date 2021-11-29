@@ -157,7 +157,8 @@ async function addRatings(client: PoolClient) {
   await client.query(
     sql`
         UPDATE movies
-        SET imdb_rating = import_temp.average_rating
+        SET imdb_rating = import_temp.average_rating,
+         num_votes = import_temp.num_votes
         FROM import_temp WHERE movies.imdb_id = import_temp.tconst
       `
   );
@@ -296,10 +297,10 @@ router.get("/import", async (request: any, response: any) => {
 
     console.log("Running Import");
     await client.query("BEGIN");
-    await insertMovies(client);
+    // await insertMovies(client);
     await addRatings(client);
-    await insertPeople(client);
-    await insertCastAndCrew(client);
+    // await insertPeople(client);
+    // await insertCastAndCrew(client);
 
     console.log("Done");
     const duration = Date.now() - start;
