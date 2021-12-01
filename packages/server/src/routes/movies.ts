@@ -7,9 +7,12 @@ const router = Router();
 router.get("/", async (request: any, response: any) => {
   let pageSize = request.query.pageSize ?? 10;
   let page = request.query.page ?? 0;
+  let searchText: string = request.query.searchText ? '%' + request.query.searchText + '%' : '%';
   let offset = (page) * pageSize;
-  db.restQuery(response, sql`SELECT * FROM movies 
-  ORDER BY id ASC 
+  //let whereClause = searchText ? sql`  WHERE english_title ILIKE '%${searchText}%'` : sql``
+
+  db.restQuery(response, sql`SELECT * FROM movies_list
+    WHERE english_title ILIKE ${searchText}
   LIMIT ${pageSize}
   OFFSET ${offset}`);
 });

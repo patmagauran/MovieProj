@@ -1,14 +1,11 @@
 {
   "configurations": [
     {
-      "type": "node-terminal",
-      "name": "Run Script: server",
-      "request": "launch",
-      "command": "yarn run server",
-      "cwd": "${workspaceFolder}",
-            "outFiles": [
-              "${workspaceFolder}/packages/server/build/**/*.js"
-            ]
+      "type": "node",
+      "request": "attach",
+      "name": "Attach",
+      "restart": true,
+      "processId": "${command:PickProcess}"
     },
         {
             "name": "Chrome",

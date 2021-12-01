@@ -1,4 +1,4 @@
-import { Pool, QueryArrayConfig, QueryArrayResult, QueryConfig } from "pg";
+import { Pool, PoolClient, QueryArrayConfig, QueryArrayResult, QueryConfig, QueryResult } from "pg";
 const pool = new Pool({
   user: "MovieProjApp",
   host: "localhost",
@@ -6,6 +6,7 @@ const pool = new Pool({
   password: "MovieProj",
   port: 5432,
 });
+import { UNSAFE_PRINT_PARAMS } from "..";
 export const sql = (
   strings: TemplateStringsArray,
   ...values: any[]
@@ -14,26 +15,49 @@ export const sql = (
   values
 });
 export const getClient = async () => {
+
   return pool.connect();
 };
 
-export const query = async (text: string | QueryConfig | QueryArrayConfig | any, params?: any) => {
+export const queryWithClient = async (client: PoolClient, text: string | QueryConfig | QueryArrayConfig | any, params?: any): Promise<QueryResult<any>> => {
   const start = Date.now();
+  //const client = await this.pool.connect()
+  try {
+    //await pool.query(`SET SESSION postgres.username = '${cUser.username}'`, [])
+    const result: QueryResult<any> = await client.query(text, params)
+    const duration = Date.now() - start;
+    if (!UNSAFE_PRINT_PARAMS && text.text) {
+      text = text.text;
+    }
+    console.log("executed query", { text, duration, rows: result.rowCount });
+    return result
+  } catch (e) {
+    if (!UNSAFE_PRINT_PARAMS && text.text) {
+      text = text.text;
+    }
+    console.log("Error query", { text });
 
-  return pool
-    .query(text, params)
-    .then((res) => {
-      const duration = Date.now() - start;
-      if (text.text) {
-        text = text.text;
-      }
-      console.log("executed query", { text, duration, rows: res.rowCount });
-      return res;
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+    console.error(e);
+    throw e
+  }
+};
+
+export const query = async (text: string | QueryConfig | QueryArrayConfig | any, params?: any): Promise<QueryResult<any>> => {
+  const start = Date.now();
+  //const client = await this.pool.connect()
+  try {
+    //await pool.query(`SET SESSION postgres.username = '${cUser.username}'`, [])
+    const result: QueryResult<any> = await pool.query(text, params)
+    const duration = Date.now() - start;
+    if (!UNSAFE_PRINT_PARAMS && text.text) {
+      text = text.text;
+    }
+    console.log("executed query", { text, duration, rows: result.rowCount });
+    return result
+  } catch (e) {
+    console.error(e);
+    throw e
+  }
 };
 
 export const restQuery = async (response: any, text: any, params?: any) => {
