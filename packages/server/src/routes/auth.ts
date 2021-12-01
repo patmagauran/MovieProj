@@ -30,7 +30,7 @@ export const addAuthRoutes = (router: e.Router) => {
             let id = user.id;
             const token = getToken({ id: id })
             const refreshToken = getRefreshToken({ id: id })
-            await db.queryWithClient(client, sql`DELETE FROM sessions WHERE user_id = ${id})`)
+            await db.queryWithClient(client, sql`DELETE FROM sessions WHERE user_id = ${id}`)
 
             await db.queryWithClient(client, sql`INSERT INTO sessions (user_id, refresh_token) VALUES (${id}, ${refreshToken})`)
             res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)

@@ -8,6 +8,9 @@ import FullCalendar, {
   EventInput,
   render,
   EventSourceFunc,
+  EventAddArg,
+  EventChangeArg,
+  EventRemoveArg,
 } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -16,13 +19,9 @@ import { INITIAL_EVENTS, createEventId } from "./eventUtils";
 import { Paper } from "@mui/material";
 import axios from "axios";
 import { UserContext } from "../../contexts/UserContext";
+import { resolvePtr } from "dns";
 
-interface DemoAppState {
-  weekendsVisible: boolean;
-  currentEvents: EventApi[];
-}
-
-export function Schedule() {
+export default function Schedule() {
   const [weekendsVisible, setWeekendsVisible] = React.useState(true);
   const [currentEvents, setcurrentEvents] = React.useState<EventApi[]>([]);
 
@@ -33,7 +32,7 @@ export function Schedule() {
     successCallback: (arg0: any) => any,
     failureCallback: (arg0: any) => any
   ): void => {
-    fetch("http://localhost:8080/" + "users/me", {
+    fetch("http://localhost:8080/" + "users/schedule", {
       method: "GET",
       credentials: "include",
       // Pass authentication token as bearer token in header
@@ -45,13 +44,13 @@ export function Schedule() {
       .then(async (response) => {
         const data = await response.json();
 
-        const events: Array<{ [key: string]: any }> = data.data.data;
+        const events: Array<{ [key: string]: any }> = data.data;
         successCallback(
-          data.map((eventEl: any) => {
+          events.map((eventEl: any) => {
             return {
               title: "Busy",
               start: eventEl.start_time,
-              end: eventEl.end_tme,
+              end: eventEl.end_time,
             };
           })
         );
@@ -66,35 +65,90 @@ export function Schedule() {
   };
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
-    let title = prompt("Please enter a new title for your event");
     let calendarApi = selectInfo.view.calendar;
 
     calendarApi.unselect(); // clear date selection
 
-    if (title) {
-      calendarApi.addEvent({
-        id: createEventId(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay,
-      });
-    }
+    calendarApi.addEvent({
+      id: createEventId(),
+      title: "busy",
+      start: selectInfo.startStr,
+      end: selectInfo.endStr,
+      allDay: selectInfo.allDay,
+    });
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${clickInfo.event.title}'`
-      )
-    ) {
-      clickInfo.event.remove();
-    }
+    clickInfo.event.remove();
   };
 
-  const handleEvents = (events: EventApi[]) => {
-    setcurrentEvents(events);
+  const addEvent = (addInfo: EventAddArg) => {
+    fetch("http://localhost:8080/" + "users/schedule", {
+      method: "POST",
+      credentials: "include",
+      // Pass authentication token as bearer token in header
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userContext.token}`,
+      },
+      body: JSON.stringify({
+        start_time: addInfo.event.start,
+        end_time: addInfo.event.end,
+      }),
+    })
+      .then(async (response) => {
+        //Possibly have a loading symbol / checkmark to signify saving of calendar
+      })
+      .catch((err) => {
+        addInfo.revert();
+      });
   };
+
+  const removeEvent = (removeInfo: EventRemoveArg) => {
+    fetch("http://localhost:8080/" + "users/schedule/delete", {
+      method: "POST",
+      credentials: "include",
+      // Pass authentication token as bearer token in header
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userContext.token}`,
+      },
+      body: JSON.stringify({
+        start_time: removeInfo.event.start,
+        end_time: removeInfo.event.end,
+      }),
+    })
+      .then(async (response) => {
+        //Possibly have a loading symbol / checkmark to signify saving of calendar
+      })
+      .catch((err) => {
+        removeInfo.revert();
+      });
+  };
+  const updateEvent = (changeInfo: EventChangeArg) => {
+    fetch("http://localhost:8080/" + "users/schedule", {
+      method: "PUT",
+      credentials: "include",
+      // Pass authentication token as bearer token in header
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userContext.token}`,
+      },
+      body: JSON.stringify({
+        old_start_time: changeInfo.oldEvent.start,
+        old_end_time: changeInfo.oldEvent.end,
+        start_time: changeInfo.event.start,
+        end_time: changeInfo.event.end,
+      }),
+    })
+      .then(async (response) => {
+        //Possibly have a loading symbol / checkmark to signify saving of calendar
+      })
+      .catch((err) => {
+        changeInfo.revert();
+      });
+  };
+
   return (
     <Paper sx={{ height: "100%" }} elevation={1}>
       <div style={{ display: "flex", height: "100%" }}>
@@ -103,9 +157,8 @@ export function Schedule() {
             height="100%"
             plugins={[timeGridPlugin, interactionPlugin]}
             headerToolbar={false}
-            initialDate="2021-11-21"
+            initialDate={new Date(2021, 10, 18)}
             nowIndicator={false}
-            now="2021-01-01"
             longPressDelay={400}
             views={{
               timeGridWeek: {
@@ -127,7 +180,10 @@ export function Schedule() {
             select={handleDateSelect}
             eventContent={renderEventContent} // custom render function
             eventClick={handleEventClick}
-            eventsSet={handleEvents} // called after events are initialized/added/changed/removed
+            //     eventsSet={handleEvents} // called after events are initialized/added/changed/removed
+            eventAdd={addEvent}
+            eventChange={updateEvent}
+            eventRemove={removeEvent}
             /* you can update a remote database when these fire:
             eventAdd={function(){}}
             eventChange={function(){}}
@@ -144,22 +200,6 @@ function renderEventContent(eventContent: EventContentArg) {
   return (
     <>
       <b>{eventContent.timeText}</b>
-      <i>{eventContent.event.title}</i>
     </>
-  );
-}
-
-function renderSidebarEvent(event: EventApi) {
-  return (
-    <li key={event.id}>
-      <b>
-        {formatDate(event.start!, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })}
-      </b>
-      <i>{event.title}</i>
-    </li>
   );
 }

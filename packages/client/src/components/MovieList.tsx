@@ -333,39 +333,37 @@ export default function MovieList() {
     [AddMovieToWatchlist, SeenMovie]
   );
   return (
-    <div>
-      <Paper sx={{ height: "100%" }} elevation={4}>
-        <div style={{ display: "flex", height: "100%" }}>
-          <div style={{ flexGrow: 1 }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={25}
-              rowsPerPageOptions={[25]}
-              rowCount={1000}
-              paginationMode="server"
-              onPageChange={(newPage) => setPage(newPage)}
-              loading={loading}
-              components={{
-                Toolbar: QuickSearchToolbar,
-              }}
-              onRowDoubleClick={(params, event) => {
-                event.defaultMuiPrevented = true;
-                console.log(params.id + "Was clicked");
-                handleClickOpen(params.row.id);
-              }}
-              componentsProps={{
-                toolbar: {
-                  value: searchText,
-                  onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
-                    requestSearch(event.target.value),
-                  clearSearch: () => requestSearch(""),
-                },
-              }}
-            />
-          </div>
+    <Paper sx={{ height: "100%" }} elevation={4}>
+      <div style={{ display: "flex", height: "100%" }}>
+        <div style={{ flexGrow: 1 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={25}
+            rowsPerPageOptions={[25]}
+            rowCount={1000}
+            paginationMode="server"
+            onPageChange={(newPage) => setPage(newPage)}
+            loading={loading}
+            components={{
+              Toolbar: QuickSearchToolbar,
+            }}
+            onRowDoubleClick={(params, event) => {
+              event.defaultMuiPrevented = true;
+              console.log(params.id + "Was clicked");
+              handleClickOpen(params.row.id);
+            }}
+            componentsProps={{
+              toolbar: {
+                value: searchText,
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                  requestSearch(event.target.value),
+                clearSearch: () => requestSearch(""),
+              },
+            }}
+          />
         </div>
-      </Paper>
+      </div>
       <Dialog open={open} onClose={handleClose}>
         {movieLoading ? (
           <LinearProgress />
@@ -440,6 +438,6 @@ export default function MovieList() {
           </div>
         )}
       </Dialog>
-    </div>
+    </Paper>
   );
 }

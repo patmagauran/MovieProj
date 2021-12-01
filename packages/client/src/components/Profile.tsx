@@ -33,10 +33,13 @@ export default function Profile() {
 
     const genericErrorMessage = "Something went wrong! Please try again later.";
 
-    fetch("http://localhost:8080/" + "me", {
-      method: "POST",
+    fetch("http://localhost:8080/" + "users/me", {
+      method: "post",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userContext.token}`,
+      },
       body: JSON.stringify({
         first_name: data.get("firstName"),
         email: data.get("email"),
@@ -60,12 +63,15 @@ export default function Profile() {
           setIsSubmitting(false);
         } else {
           if (data.get("password") != "") {
-            fetch("http://localhost:8080/" + "updatePassword", {
+            fetch("http://localhost:8080/" + "users/updatePassword", {
               method: "POST",
               credentials: "include",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userContext.token}`,
+              },
               body: JSON.stringify({
-                first_name: data.get("password"),
+                password: data.get("password"),
               }),
             })
               .then(async (response) => {
@@ -89,6 +95,8 @@ export default function Profile() {
                 setIsSubmitting(false);
                 setError(genericErrorMessage);
               });
+          } else {
+            setIsSubmitting(false);
           }
         }
       })
