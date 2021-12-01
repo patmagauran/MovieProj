@@ -10,16 +10,8 @@ import {
   GridValueOptionsParams,
   GridRowParams,
   GridValueFormatterParams,
-  MuiEvent,
 } from "@mui/x-data-grid";
-import {
-  Box,
-  Container,
-  LinearProgress,
-  Paper,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, Container, Paper, Tooltip } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useGridApiContext, useGridState } from "@mui/x-data-grid";
 import Pagination from "@mui/material/Pagination";
@@ -30,12 +22,6 @@ import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 const initialRows: GridRowsProp = sampleData;
 
 const useStyles = makeStyles({
@@ -111,40 +97,13 @@ function QuickSearchToolbar(props: QuickSearchToolbarProps) {
     </div>
   );
 }
-
-interface movieType {
-  [key: string]: any;
-}
-
 export default function MovieList() {
   //  const [rows, setRows] = React.useState(sampleData);
   const [page, setPage] = React.useState(0);
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [searchText, setSearchText] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-  const [currentMovie, setCurrentMovie] = React.useState<movieType>({});
-  const [movieLoading, setMovieLoading] = React.useState<boolean>(false);
-  const handleClickOpen = (id: number) => {
-    setMovieLoading(true);
-    axios
-      .get("http://localhost:8080/movies/" + id)
-      .then((response) => {
-        setCurrentMovie(response.data.data[0]);
-        setMovieLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setMovieLoading(false);
-      });
 
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setCurrentMovie({});
-    setOpen(false);
-  };
   const requestSearch = (searchValue: string) => {
     setSearchText(searchValue);
     // //  const searchRegex = new RegExp(escapeRegExp(searchValue), "i");
@@ -195,45 +154,23 @@ export default function MovieList() {
   }, [page]);
   const AddMovieToWatchlist = React.useCallback(
     (id: GridRowId) => () => {
-      const alreadyWants = rows.find((row) => row.id == id)!.wants_to_see;
-      fetch("http://localhost:8080/" + "movies/seenMovie/" + id, {
-        method: alreadyWants ? "DELETE" : "PUT",
-        credentials: "include",
-      })
-        .then(async (response) => {
-          if (!response.ok) {
-          } else {
-            setRows((prevRows) =>
-              prevRows.map((row) =>
-                row.id === id ? { ...row, WantToSee: !row.WantToSee } : row
-              )
-            );
-          }
-        })
-        .catch((error) => {});
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === id ? { ...row, WantToSee: !row.WantToSee } : row
+        )
+      );
+      console.log(" I want to see " + id);
     },
     []
   );
 
   const SeenMovie = React.useCallback(
     (id: GridRowId) => () => {
-      const alreadySeen = rows.find((row) => row.id == id)!.has_seen;
-      fetch("http://localhost:8080/" + "movies/wantSeeMovie/" + id, {
-        method: alreadySeen ? "DELETE" : "PUT",
-        credentials: "include",
-      })
-        .then(async (response) => {
-          if (!response.ok) {
-          } else {
-            setRows((prevRows) =>
-              prevRows.map((row) =>
-                row.id === id ? { ...row, HaveSeen: !row.HaveSeen } : row
-              )
-            );
-          }
-        })
-        .catch((error) => {});
-
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row.id === id ? { ...row, HaveSeen: !row.HaveSeen } : row
+        )
+      );
       console.log(" I Have seen " + id);
     },
     []
@@ -312,7 +249,7 @@ export default function MovieList() {
           <GridActionsCellItem
             icon={
               <WatchLaterIcon
-                color={params.row.wants_to_see ? "primary" : "inherit"}
+                color={params.row.WantToSee ? "primary" : "inherit"}
               />
             }
             label="Delete"
@@ -321,7 +258,7 @@ export default function MovieList() {
           <GridActionsCellItem
             icon={
               <ThumbsUpDownIcon
-                color={params.row.has_seen ? "primary" : "inherit"}
+                color={params.row.HaveSeen ? "primary" : "inherit"}
               />
             }
             label="Toggle Admin"
@@ -333,113 +270,32 @@ export default function MovieList() {
     [AddMovieToWatchlist, SeenMovie]
   );
   return (
-    <div>
-      <Paper sx={{ height: "100%" }} elevation={4}>
-        <div style={{ display: "flex", height: "100%" }}>
-          <div style={{ flexGrow: 1 }}>
-            <DataGrid
-              rows={rows}
-              columns={columns}
-              pageSize={25}
-              rowsPerPageOptions={[25]}
-              rowCount={1000}
-              paginationMode="server"
-              onPageChange={(newPage) => setPage(newPage)}
-              loading={loading}
-              components={{
-                Toolbar: QuickSearchToolbar,
-              }}
-              onRowDoubleClick={(params, event) => {
-                event.defaultMuiPrevented = true;
-                console.log(params.id + "Was clicked");
-                handleClickOpen(params.row.id);
-              }}
-              componentsProps={{
-                toolbar: {
-                  value: searchText,
-                  onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
-                    requestSearch(event.target.value),
-                  clearSearch: () => requestSearch(""),
-                },
-              }}
-            />
-          </div>
+    <Paper sx={{ height: "100%" }} elevation={4}>
+      <div style={{ display: "flex", height: "100%" }}>
+        <div style={{ flexGrow: 1 }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            pageSize={25}
+            rowsPerPageOptions={[25]}
+            rowCount={1000}
+            paginationMode="server"
+            onPageChange={(newPage) => setPage(newPage)}
+            loading={loading}
+            components={{
+              Toolbar: QuickSearchToolbar,
+            }}
+            componentsProps={{
+              toolbar: {
+                value: searchText,
+                onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
+                  requestSearch(event.target.value),
+                clearSearch: () => requestSearch(""),
+              },
+            }}
+          />
         </div>
-      </Paper>
-      <Dialog open={open} onClose={handleClose}>
-        {movieLoading ? (
-          <LinearProgress />
-        ) : (
-          <div>
-            <DialogTitle>{currentMovie.english_title}</DialogTitle>
-            <DialogContent>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                }}
-              >
-                <Box
-                  sx={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <img src={currentMovie.poster_link} />
-                  <TextField value={currentMovie.poster_link} />
-                </Box>
-              </Box>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                fullWidth
-                variant="standard"
-                value={currentMovie.description}
-              />
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                fullWidth
-                variant="standard"
-                value={currentMovie.preview_link}
-              />
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                fullWidth
-                variant="standard"
-                value={currentMovie.language}
-              />
-              <Typography>{currentMovie.imdb_rating}</Typography>
-              <Typography>{currentMovie.num_votes}</Typography>
-              <Typography>{currentMovie.release_year}</Typography>
-              <Typography>
-                <a href={currentMovie.preview_link} />
-                Preview
-              </Typography>
-              <Typography>
-                <a href={"https://imdb.com/title/" + currentMovie.imdb_id} />
-                IMDB
-              </Typography>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleClose}>Subscribe</Button>
-            </DialogActions>
-          </div>
-        )}
-      </Dialog>
-    </div>
+      </div>
+    </Paper>
   );
 }

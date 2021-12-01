@@ -5,106 +5,67 @@ import FullCalendar, {
   EventClickArg,
   EventContentArg,
   formatDate,
+  EventInput,
+  render,
+  EventSourceFunc,
 } from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { INITIAL_EVENTS, createEventId } from "./eventUtils";
 import { Paper } from "@mui/material";
+import axios from "axios";
+import { UserContext } from "../../contexts/UserContext";
 
 interface DemoAppState {
   weekendsVisible: boolean;
   currentEvents: EventApi[];
 }
 
-export default class DemoApp extends React.Component<{}, DemoAppState> {
-  state: DemoAppState = {
-    weekendsVisible: true,
-    currentEvents: [],
+export function Schedule() {
+  const [weekendsVisible, setWeekendsVisible] = React.useState(true);
+  const [currentEvents, setcurrentEvents] = React.useState<EventApi[]>([]);
+
+  const { userContext, setUserContext } = React.useContext(UserContext);
+
+  const getEventFeed = (
+    info: any,
+    successCallback: (arg0: any) => any,
+    failureCallback: (arg0: any) => any
+  ): void => {
+    fetch("http://localhost:8080/" + "users/me", {
+      method: "GET",
+      credentials: "include",
+      // Pass authentication token as bearer token in header
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userContext.token}`,
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json();
+
+        const events: Array<{ [key: string]: any }> = data.data.data;
+        successCallback(
+          data.map((eventEl: any) => {
+            return {
+              title: "Busy",
+              start: eventEl.start_time,
+              end: eventEl.end_tme,
+            };
+          })
+        );
+      })
+      .catch((err) => {
+        failureCallback(err);
+      });
   };
 
-  render() {
-    return (
-      <Paper sx={{ height: "100%" }} elevation={1}>
-        <div style={{ display: "flex", height: "100%" }}>
-          <div style={{ flexGrow: 1 }}>
-            <FullCalendar
-              height="100%"
-              plugins={[timeGridPlugin, interactionPlugin]}
-              headerToolbar={false}
-              initialDate="2021-11-21"
-              nowIndicator={false}
-              now="2021-01-01"
-              longPressDelay={400}
-              views={{
-                timeGridWeek: {
-                  // name of view
-                  allDaySlot: false,
-                  nowIndicator: false,
-                  expandRows: true,
-                  dayHeaderFormat: { weekday: "short" },
-                  // other view-specific options here
-                },
-              }}
-              initialView="timeGridWeek"
-              editable={true}
-              selectable={true}
-              selectMirror={true}
-              dayMaxEvents={true}
-              weekends={this.state.weekendsVisible}
-              initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
-              select={this.handleDateSelect}
-              eventContent={renderEventContent} // custom render function
-              eventClick={this.handleEventClick}
-              eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
-              /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
-            />
-          </div>
-        </div>
-      </Paper>
-    );
-  }
-
-  renderSidebar() {
-    return (
-      <div className="demo-app-sidebar">
-        <div className="demo-app-sidebar-section">
-          <h2>Instructions</h2>
-          <ul>
-            <li>Select dates and you will be prompted to create a new event</li>
-            <li>Drag, drop, and resize events</li>
-            <li>Click an event to delete it</li>
-          </ul>
-        </div>
-        <div className="demo-app-sidebar-section">
-          <label>
-            <input
-              type="checkbox"
-              checked={this.state.weekendsVisible}
-              onChange={this.handleWeekendsToggle}
-            ></input>
-            toggle weekends
-          </label>
-        </div>
-        <div className="demo-app-sidebar-section">
-          <h2>All Events ({this.state.currentEvents.length})</h2>
-          <ul>{this.state.currentEvents.map(renderSidebarEvent)}</ul>
-        </div>
-      </div>
-    );
-  }
-
-  handleWeekendsToggle = () => {
-    this.setState({
-      weekendsVisible: !this.state.weekendsVisible,
-    });
+  const handleWeekendsToggle = () => {
+    setWeekendsVisible(!weekendsVisible);
   };
 
-  handleDateSelect = (selectInfo: DateSelectArg) => {
+  const handleDateSelect = (selectInfo: DateSelectArg) => {
     let title = prompt("Please enter a new title for your event");
     let calendarApi = selectInfo.view.calendar;
 
@@ -121,7 +82,7 @@ export default class DemoApp extends React.Component<{}, DemoAppState> {
     }
   };
 
-  handleEventClick = (clickInfo: EventClickArg) => {
+  const handleEventClick = (clickInfo: EventClickArg) => {
     if (
       window.confirm(
         `Are you sure you want to delete the event '${clickInfo.event.title}'`
@@ -131,11 +92,52 @@ export default class DemoApp extends React.Component<{}, DemoAppState> {
     }
   };
 
-  handleEvents = (events: EventApi[]) => {
-    this.setState({
-      currentEvents: events,
-    });
+  const handleEvents = (events: EventApi[]) => {
+    setcurrentEvents(events);
   };
+  return (
+    <Paper sx={{ height: "100%" }} elevation={1}>
+      <div style={{ display: "flex", height: "100%" }}>
+        <div style={{ flexGrow: 1 }}>
+          <FullCalendar
+            height="100%"
+            plugins={[timeGridPlugin, interactionPlugin]}
+            headerToolbar={false}
+            initialDate="2021-11-21"
+            nowIndicator={false}
+            now="2021-01-01"
+            longPressDelay={400}
+            views={{
+              timeGridWeek: {
+                // name of view
+                allDaySlot: false,
+                nowIndicator: false,
+                expandRows: true,
+                dayHeaderFormat: { weekday: "short" },
+                // other view-specific options here
+              },
+            }}
+            initialView="timeGridWeek"
+            editable={true}
+            selectable={true}
+            selectMirror={true}
+            dayMaxEvents={true}
+            weekends={weekendsVisible}
+            events={getEventFeed} // alternatively, use the `events` setting to fetch from a feed
+            select={handleDateSelect}
+            eventContent={renderEventContent} // custom render function
+            eventClick={handleEventClick}
+            eventsSet={handleEvents} // called after events are initialized/added/changed/removed
+            /* you can update a remote database when these fire:
+            eventAdd={function(){}}
+            eventChange={function(){}}
+            eventRemove={function(){}}
+            */
+          />
+        </div>
+      </div>
+    </Paper>
+  );
 }
 
 function renderEventContent(eventContent: EventContentArg) {
