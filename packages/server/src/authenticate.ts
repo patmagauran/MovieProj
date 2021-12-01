@@ -11,7 +11,7 @@ export const COOKIE_OPTIONS: CookieOptions = {
     secure: !dev,
     signed: true,
     maxAge: eval(process.env.REFRESH_TOKEN_EXPIRY! as string) * 1000,
-    sameSite: "none",
+    sameSite: "lax",
 }
 
 export const getToken = (user: string | object | Buffer) => {
