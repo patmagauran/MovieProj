@@ -41,8 +41,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { UserContext } from "../contexts/UserContext";
 import { useImage } from "react-image";
 import ReactPlayer from "react-player";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 const initialRows: GridRowsProp = sampleData;
 
 const useStyles = makeStyles({
@@ -143,21 +141,25 @@ export default function MovieList({
   const { userContext, setUserContext } = React.useContext(UserContext);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState("");
+  const openInNewTab = (url: string): void => {
+    const newWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (newWindow) newWindow.opener = null;
+  };
+  const handleClickOpen = (imdb_id: string) => {
+    // setMovieLoading(true);
+    // axios
+    //   .get("http://localhost:8080/movies/" + id)
+    //   .then((response) => {
+    //     setCurrentMovie(response.data.data[0]);
+    //     setMovieLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     setMovieLoading(false);
+    //   });
 
-  const handleClickOpen = (id: number) => {
-    setMovieLoading(true);
-    axios
-      .get("http://localhost:8080/movies/" + id)
-      .then((response) => {
-        setCurrentMovie(response.data.data[0]);
-        setMovieLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setMovieLoading(false);
-      });
-
-    setOpen(true);
+    // setOpen(true);
+    openInNewTab("https://imdb.com/name/" + imdb_id);
   };
 
   const handleClose = () => {
@@ -212,83 +214,15 @@ export default function MovieList({
       active = false;
     };
   }, [page]);
-  const AddMovieToWatchlist = React.useCallback(
-    (old_row: any) => () => {
-      const alreadyWants = old_row.wants_to_see;
-      fetch("http://localhost:8080/" + "movies/wantSeeMovie/" + old_row.id, {
-        method: alreadyWants ? "DELETE" : "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userContext.token}`,
-        },
-      })
-        .then(async (response) => {
-          if (!response.ok) {
-            console.log("error");
-          } else {
-            setRows((prevRows) => {
-              return prevRows.map((row) => {
-                return row.id === old_row.id
-                  ? { ...row, wants_to_see: !row.wants_to_see }
-                  : row;
-              });
-            });
-          }
-        })
-        .catch((error) => {});
-    },
-    []
-  );
-
-  const SeenMovie = React.useCallback(
-    (old_row: any, dislike = false) =>
-      () => {
-        const alreadySeen = old_row.has_seen_liked || old_row.has_seen_disliked;
-        const alreadyChecked =
-          (old_row.has_seen_liked && dislike) ||
-          (old_row.has_seen_disliked && !dislike);
-        if (alreadyChecked) {
-        } else {
-          fetch("http://localhost:8080/" + "movies/seenMovie/" + old_row.id, {
-            method: alreadySeen ? "DELETE" : "PUT",
-            credentials: "include",
-            body: JSON.stringify({ dislike: dislike }),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userContext.token}`,
-            },
-          })
-            .then(async (response) => {
-              if (!response.ok) {
-              } else {
-                setRows((prevRows) =>
-                  prevRows.map((row) =>
-                    row.id === old_row.id
-                      ? {
-                          ...row,
-                          has_seen_liked: !row.has_seen_liked && !dislike,
-                          has_seen_disliked: !row.has_seen_disliked && dislike,
-                        }
-                      : row
-                  )
-                );
-              }
-            })
-            .catch((error) => {});
-        }
-      },
-    []
-  );
 
   const columns = React.useMemo(
     () => [
       {
-        field: "english_title",
-        headerName: "English Title",
+        field: "name",
+        headerName: "Name",
         flex: 1,
         renderCell: (params: any) => (
-          <Tooltip title={params.row.english_title}>
+          <Tooltip title={params.row.name}>
             <Box
               sx={{
                 whiteSpace: "nowrap",
@@ -296,18 +230,18 @@ export default function MovieList({
                 textOverflow: "ellipsis",
               }}
             >
-              {params.row.english_title}
+              {params.row.name}
             </Box>
           </Tooltip>
         ),
       },
       {
-        field: "genres",
-        headerName: "Genres",
+        field: "categories",
+        headerName: "Job Categories",
         flex: 1,
 
         renderCell: (params: any) => (
-          <Tooltip title={params.row.genres}>
+          <Tooltip title={params.row.categories}>
             <Box
               sx={{
                 whiteSpace: "nowrap",
@@ -315,121 +249,39 @@ export default function MovieList({
                 textOverflow: "ellipsis",
               }}
             >
-              {params.row.genres}
+              {params.row.categories}
             </Box>
           </Tooltip>
         ),
       },
-      { field: "imdb_rating", headerName: "IMDB Rating", flex: 1 },
-
       {
-        field: "release_year",
-        headerName: "Release Year",
+        field: "movie_titles",
+        headerName: "Most Popular Movies",
         flex: 1,
-        valueFormatter: (params: GridValueFormatterParams) => {
-          const asDate = new Date(params.value as string);
-          const valueFormatted = asDate.getFullYear();
-          return `${valueFormatted}`;
-        },
+
+        renderCell: (params: any) => (
+          <Tooltip title={params.row.movie_titles}>
+            <Box
+              sx={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {params.row.movie_titles}
+            </Box>
+          </Tooltip>
+        ),
       },
       {
-        field: "runtime",
-        headerName: "Runtime",
+        field: "sum_votes",
+        headerName: "IMDB Votes",
+        description: "How Many Votes they Have on IMDB",
         flex: 1,
-        valueFormatter: (params: GridValueFormatterParams) => {
-          const vminutes = params.value as number;
-          var hours = Math.floor(vminutes / 60);
-          var minutes = vminutes % 60;
-
-          //const asDate = new Date(params.value as number);
-          // const valueFormatted = asDate.getFullYear();
-          return `${hours}h ${minutes}m`;
-        },
-      },
-      ...additonalColumns,
-      {
-        field: "actions",
-        type: "actions",
-        width: 80,
-        getActions: (params: GridRowParams) => [
-          <GridActionsCellItem
-            icon={
-              <WatchLaterIcon
-                color={params.row.wants_to_see ? "primary" : "inherit"}
-              />
-            }
-            label="Watch Later"
-            onClick={AddMovieToWatchlist(params.row)}
-          />,
-          <GridActionsCellItem
-            icon={
-              <ThumbUpIcon
-                color={params.row.has_seen_liked ? "primary" : "inherit"}
-              />
-            }
-            label="Seen & Liked"
-            onClick={SeenMovie(params.row, false)}
-          />,
-          <GridActionsCellItem
-            icon={
-              <ThumbDownIcon
-                color={params.row.has_seen_disliked ? "primary" : "inherit"}
-              />
-            }
-            label="Seen & Disliked"
-            onClick={SeenMovie(params.row, true)}
-          />,
-        ],
       },
     ],
-    [AddMovieToWatchlist, SeenMovie]
+    []
   );
-  const formSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-
-    setIsSubmitting(true);
-    setError("");
-
-    const genericErrorMessage = "Something went wrong! Please try again later.";
-
-    fetch("http://localhost:8080/" + "movies/" + data.get("id"), {
-      method: "put",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userContext.token}`,
-      },
-      body: JSON.stringify({
-        preview_link: data.get("preview_link"),
-        poster_link: data.get("poster_link"),
-        description: data.get("description"),
-        language: data.get("language"),
-      }),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          if (response.status === 400) {
-            setError("Please fill all the fields correctly!");
-          } else if (response.status === 401) {
-            setError("Invalid email and password combination.");
-          } else if (response.status === 500) {
-            console.log(response);
-            const data = await response.json();
-            if (data.message) setError(data.message || genericErrorMessage);
-          } else {
-            setError(genericErrorMessage);
-          }
-          setIsSubmitting(false);
-        } else {
-          setIsSubmitting(false);
-        }
-      })
-      .catch((error) => {
-        setIsSubmitting(false);
-        setError(genericErrorMessage);
-      });
-  };
 
   return (
     <Paper sx={{ height: "100%" }} elevation={4}>
@@ -450,7 +302,7 @@ export default function MovieList({
             onRowDoubleClick={(params, event) => {
               event.defaultMuiPrevented = true;
               console.log(params.id + "Was clicked");
-              handleClickOpen(params.row.id);
+              handleClickOpen(params.row.imdb_id);
             }}
             componentsProps={{
               toolbar: {
@@ -463,7 +315,7 @@ export default function MovieList({
           />
         </div>
       </div>
-      <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth="lg">
+      {/* <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth="lg">
         {movieLoading ? (
           <LinearProgress />
         ) : (
@@ -626,7 +478,7 @@ export default function MovieList({
             </DialogActions>
           </div>
         )}
-      </Dialog>
+      </Dialog> */}
     </Paper>
   );
 }

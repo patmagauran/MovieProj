@@ -3,7 +3,7 @@
 import React from "react";
 import { css } from "@emotion/react";
 import { Box, Typography } from "@mui/material";
-import MovieList from "../components/MovieList";
+import CastList from "../components/CastList";
 import axios from "axios";
 import { UserContext } from "../contexts/UserContext";
 
@@ -21,7 +21,7 @@ const BrowsePage = () => {
   function loadServerRows(page: number, searchText?: string): Promise<any> {
     return new Promise<any>((resolve) => {
       axios
-        .get("http://localhost:8080/movies/userMovies", {
+        .get("http://localhost:8080/people", {
           params: {
             page: page,
             pageSize: 25,
@@ -48,9 +48,9 @@ const BrowsePage = () => {
       flexDirection="column"
     >
       <Typography variant="h3" textAlign="center">
-        Explore the Selection!
+        Explore the most famous Actors and Crew!
       </Typography>
-      <MovieList loadServerRows={loadServerRows} />
+      <CastList loadServerRows={loadServerRows} />
     </Box>
   );
 };

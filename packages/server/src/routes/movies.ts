@@ -35,8 +35,33 @@ router.get("/userMovies", verifyUser, async (request: any, response: any) => {
       movies_list_mv.runtime,
       movies_list_mv.imdb_id,
       (SELECT COUNT(friends_want_to_see_movies.movie) > 0 FROM friends_want_to_see_movies WHERE friends_want_to_see_movies.user = ${user.id} AND friends_want_to_see_movies.movie = movies_list_mv.id) as wants_to_see,
-      (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id) as has_seen
+      (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id AND friend_seen_movie.see_again) as has_seen_like,
+            (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id AND (NOT friend_seen_movie.see_again)) as has_seen_dislike
     FROM movies_list_mv
+    WHERE english_title ILIKE ${searchText}
+  LIMIT ${pageSize}
+  OFFSET ${offset}`);
+});
+
+router.get("/userMoviesToSee", verifyUser, async (request: any, response: any) => {
+  let user = request.user;
+  let pageSize = request.query.pageSize ?? 10;
+  let page = request.query.page ?? 0;
+  let searchText: string = request.query.searchText ? '%' + request.query.searchText + '%' : '%';
+  let offset = (page) * pageSize;
+  //let whereClause = searchText ? sql`  WHERE english_title ILIKE '%${searchText}%'` : sql``
+
+  db.restQuery(response, sql`SELECT 
+      movies_to_see.id,
+      movies_to_see.english_title,
+      movies_to_see.imdb_rating,
+      movies_to_see.release_year,
+      movies_to_see.runtime,
+      movies_to_see.imdb_id,
+      (SELECT COUNT(friends_want_to_see_movies.movie) > 0 FROM friends_want_to_see_movies WHERE friends_want_to_see_movies.user = ${user.id} AND friends_want_to_see_movies.movie = movies_list_mv.id) as wants_to_see,
+      (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id AND friend_seen_movie.see_again) as has_seen_like,
+            (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id AND (NOT friend_seen_movie.see_again)) as has_seen_dislike
+    FROM movies_to_see
     WHERE english_title ILIKE ${searchText}
   LIMIT ${pageSize}
   OFFSET ${offset}`);
@@ -47,7 +72,7 @@ router.post("/updateFromTmdb", verifyUser, async (request: any, response: any) =
 })
 
 router.put("/seenMovie/:id", verifyUser, async (request: any, response: any) =>
-  db.restQuery(response, sql`INSERT INTO friend_seen_movie ("user", movie) VALUES (${request.user.id}, ${request.params.id})`)
+  db.restQuery(response, sql`INSERT INTO friend_seen_movie ("user", movie, see_again) VALUES (${request.user.id}, ${request.params.id}, ${!request.body.dislike})`)
 );
 router.put("/wantSeeMovie/:id", verifyUser, async (request: any, response: any) =>
   db.restQuery(response, sql`INSERT INTO friends_want_to_see_movies ("user", movie) VALUES (${request.user.id}, ${request.params.id})`)

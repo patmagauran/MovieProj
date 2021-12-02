@@ -9,6 +9,15 @@ import { getErrorMessage } from "../utilities";
 
 addAuthRoutes(router);
 
+
+
+router.get("/getUsers", verifyUser, async (request: any, response: any) =>
+  db.restQuery(
+    response,
+    sql`SELECT id, username, (first_name || ' ' || last_name) as full_name from users`
+  )
+);
+
 router.get("/me", verifyUser, (req, res, next) => {
   res.send(req.user)
 })
@@ -20,6 +29,17 @@ router.post("/me", verifyUser, async (request: any, response: any) =>
     sql`UPDATE users SET "username" = ${request.body.username}, first_name = ${request.body.first_name}, last_name = ${request.body.last_name}, email = ${request.body.email} WHERE id = ${request.user.id}`
   )
 );
+
+router.get("/allSchedules", verifyUser, async (request, response, next) => {
+  let user = request.user;
+
+  //let whereClause = searchText ? sql`  WHERE english_title ILIKE '%${searchText}%'` : sql``
+
+  db.restQuery(response, sql`SELECT 
+      lower(time_range) as start_time, upper(time_range) as end_time, id, username, (first_name || ' ' || last_name) as full_name  FROM user_available
+      JOIN users ON user_available.user_id = id
+`);
+})
 
 router.get("/schedule", verifyUser, async (request, response, next) => {
   let user = request.user;

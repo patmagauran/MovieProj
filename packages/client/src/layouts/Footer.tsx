@@ -6,6 +6,8 @@ import MovieIcon from "@mui/icons-material/Movie";
 import LocalMoviesIcon from "@mui/icons-material/LocalMovies";
 import { useLocation, matchPath } from "react-router-dom";
 import SettingsIcon from "@mui/icons-material/Settings";
+import PeopleIcon from "@mui/icons-material/People";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 const footerStyle = css`
   padding: 40px 16px;
   & > nav {
@@ -45,6 +47,18 @@ const Footer = () => {
           icon={<MovieIcon />}
           component={RouterLink}
           to="/browse"
+        />
+        <BottomNavigationAction
+          label="Cast/Crew"
+          icon={<PeopleIcon />}
+          component={RouterLink}
+          to="/people"
+        />
+        <BottomNavigationAction
+          label="Schedule Viewer"
+          icon={<CalendarTodayIcon />}
+          component={RouterLink}
+          to="/allSchedule"
         />
         <BottomNavigationAction
           label="Settings"

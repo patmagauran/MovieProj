@@ -4,27 +4,17 @@ import FullCalendar, {
   DateSelectArg,
   EventClickArg,
   EventContentArg,
-  formatDate,
-  EventInput,
-  render,
-  EventSourceFunc,
   EventAddArg,
   EventChangeArg,
   EventRemoveArg,
 } from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { INITIAL_EVENTS, createEventId } from "./eventUtils";
+import { createEventId } from "./eventUtils";
 import { Paper } from "@mui/material";
-import axios from "axios";
 import { UserContext } from "../../contexts/UserContext";
-import { resolvePtr } from "dns";
 
 export default function Schedule() {
-  const [weekendsVisible, setWeekendsVisible] = React.useState(true);
-  const [currentEvents, setcurrentEvents] = React.useState<EventApi[]>([]);
-
   const { userContext, setUserContext } = React.useContext(UserContext);
 
   const getEventFeed = (
@@ -58,10 +48,6 @@ export default function Schedule() {
       .catch((err) => {
         failureCallback(err);
       });
-  };
-
-  const handleWeekendsToggle = () => {
-    setWeekendsVisible(!weekendsVisible);
   };
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
@@ -175,20 +161,14 @@ export default function Schedule() {
             selectable={true}
             selectMirror={true}
             dayMaxEvents={true}
-            weekends={weekendsVisible}
+            weekends={true}
             events={getEventFeed} // alternatively, use the `events` setting to fetch from a feed
             select={handleDateSelect}
             eventContent={renderEventContent} // custom render function
             eventClick={handleEventClick}
-            //     eventsSet={handleEvents} // called after events are initialized/added/changed/removed
             eventAdd={addEvent}
             eventChange={updateEvent}
             eventRemove={removeEvent}
-            /* you can update a remote database when these fire:
-            eventAdd={function(){}}
-            eventChange={function(){}}
-            eventRemove={function(){}}
-            */
           />
         </div>
       </div>
