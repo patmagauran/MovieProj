@@ -67,15 +67,20 @@ router.get("/:id", async (request: any, response: any) =>
 //   db.restQuery(response, sql`INSERT INTO users (name, email) VALUES (${request.body.name}, ${request.body.email})`)
 // );
 //UPDATE
-router.put("/:id", verifyUser, async (request: any, response: any) =>
+router.put("/:id", verifyUser, async (request: any, response: any) => {
+  let language = request.body.language;
+  if (!language || isNaN(language) || language === '') {
+    language = null;
+  }
   db.restQuery(
     response,
     sql`UPDATE movies SET 
-    preview_link = ${request.body.preview_link}, 
+    preview_link = ${request.body.preview_link},
     description = ${request.body.description},
     poster_link = ${request.body.poster_link},
-    language = ${request.body.language} WHERE id = ${request.params.id}`
+    language = ${language} WHERE id = ${request.params.id}`
   )
+}
 );
 // //DELETE
 // router.delete("/:id", async (request: any, response: any) =>

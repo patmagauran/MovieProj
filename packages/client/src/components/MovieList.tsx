@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import axios from "axios";
 import {
   DataGrid,
@@ -19,6 +19,7 @@ import {
   Link,
   Paper,
   Tooltip,
+  Alert,
   Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
@@ -38,7 +39,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { UserContext } from "../contexts/UserContext";
-
+import { useImage } from "react-image";
+import ReactPlayer from "react-player";
 const initialRows: GridRowsProp = sampleData;
 
 const useStyles = makeStyles({
@@ -98,6 +100,26 @@ function QuickSearchToolbar(props: QuickSearchToolbarProps) {
   );
 }
 
+function PosterImageLoader(posterLink: any) {
+  console.log(posterLink);
+  console.log(posterLink as String);
+  const { src } = useImage({
+    srcList: [
+      posterLink.posterLink as string,
+      "https://1080motion.com/wp-content/uploads/2018/06/NoImageFound.jpg.png",
+    ],
+  });
+
+  return (
+    <img
+      width="300px"
+      height="450px"
+      style={{ objectFit: "contain" }}
+      src={src}
+    />
+  );
+}
+
 interface movieType {
   [key: string]: any;
 }
@@ -112,7 +134,8 @@ export default function MovieList() {
   const [currentMovie, setCurrentMovie] = React.useState<movieType>({});
   const [movieLoading, setMovieLoading] = React.useState<boolean>(false);
   const { userContext, setUserContext } = React.useContext(UserContext);
-
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [error, setError] = React.useState("");
   function loadServerRows(page: number, searchText?: string): Promise<any> {
     return new Promise<any>((resolve) => {
       axios
@@ -355,6 +378,53 @@ export default function MovieList() {
     ],
     [AddMovieToWatchlist, SeenMovie]
   );
+  const formSubmitHandler = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    setIsSubmitting(true);
+    setError("");
+
+    const genericErrorMessage = "Something went wrong! Please try again later.";
+
+    fetch("http://localhost:8080/" + "movies/" + data.get("id"), {
+      method: "put",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userContext.token}`,
+      },
+      body: JSON.stringify({
+        preview_link: data.get("preview_link"),
+        poster_link: data.get("poster_link"),
+        description: data.get("description"),
+        language: data.get("language"),
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          if (response.status === 400) {
+            setError("Please fill all the fields correctly!");
+          } else if (response.status === 401) {
+            setError("Invalid email and password combination.");
+          } else if (response.status === 500) {
+            console.log(response);
+            const data = await response.json();
+            if (data.message) setError(data.message || genericErrorMessage);
+          } else {
+            setError(genericErrorMessage);
+          }
+          setIsSubmitting(false);
+        } else {
+          setIsSubmitting(false);
+        }
+      })
+      .catch((error) => {
+        setIsSubmitting(false);
+        setError(genericErrorMessage);
+      });
+  };
+
   return (
     <Paper sx={{ height: "100%" }} elevation={4}>
       <div style={{ display: "flex", height: "100%" }}>
@@ -387,80 +457,173 @@ export default function MovieList() {
           />
         </div>
       </div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth="lg">
         {movieLoading ? (
           <LinearProgress />
         ) : (
           <div>
-            <DialogTitle>{currentMovie.english_title}</DialogTitle>
-            <DialogContent>
+            <DialogTitle>
               <Box
                 sx={{
                   display: "flex",
+                  alignItems: "baseline",
                   flexDirection: "row",
-                  flexWrap: "wrap",
                 }}
+              >
+                <Typography variant="h3" component="div">
+                  {currentMovie.english_title}
+                </Typography>
+
+                <Box
+                  sx={{
+                    flexDirection: "row",
+                    display: "flex",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      height: "1.5rem",
+                      margin: "0 4px",
+                      alignSelf: "center",
+                    }}
+                  >
+                    <img
+                      height="100%"
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/2560px-IMDB_Logo_2016.svg.png"
+                    />
+                  </Box>
+
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      margin: "0 4px",
+                    }}
+                  >
+                    {currentMovie.imdb_rating} / 10
+                  </Typography>
+
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      margin: "0 4px",
+                    }}
+                  >
+                    {"(" + currentMovie.num_votes + " votes)"}
+                  </Typography>
+                </Box>
+                <Typography variant="h5">
+                  {new Date(currentMovie.release_year).getFullYear()}{" "}
+                </Typography>
+              </Box>
+            </DialogTitle>
+            <DialogContent>
+              {error && <Alert severity="warning">{error}</Alert>}
+              <Box
+                component="form"
+                id="MovieForm"
+                noValidate
+                onSubmit={formSubmitHandler}
               >
                 <Box
                   sx={{
-                    flex: 1,
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    marginTop: "8px",
                   }}
                 >
-                  <img src={currentMovie.poster_link} />
-                  <TextField value={currentMovie.poster_link ?? ""} />
+                  <input
+                    type="hidden"
+                    name="id"
+                    defaultValue={currentMovie.id}
+                  />
+                  <Box
+                    sx={{
+                      flex: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      marginRight: "8px",
+                    }}
+                  >
+                    <Suspense fallback={null}>
+                      <PosterImageLoader
+                        posterLink={currentMovie.poster_link}
+                      />
+                    </Suspense>
+
+                    <TextField
+                      label="Link to Poster Image"
+                      name="poster_link"
+                      id="poster_link"
+                      margin="normal"
+                      defaultValue={currentMovie.poster_link ?? ""}
+                    />
+                  </Box>
+                  <TextField
+                    autoFocus
+                    margin="normal"
+                    sx={{
+                      flex: 1,
+                      marginTop: 0,
+                      height: "100%",
+                    }}
+                    id="description"
+                    name="description"
+                    label="Description"
+                    fullWidth
+                    rows={20}
+                    variant="outlined"
+                    multiline
+                    defaultValue={currentMovie.description ?? ""}
+                  />
                 </Box>
+
+                <TextField
+                  sx={{
+                    flex: 2,
+                  }}
+                  margin="normal"
+                  id="preview_link"
+                  name="preview_link"
+                  label="Link to Preview"
+                  fullWidth
+                  variant="outlined"
+                  defaultValue={currentMovie.preview_link ?? ""}
+                />
+                <TextField
+                  margin="normal"
+                  id="language"
+                  name="language"
+                  label="Language"
+                  fullWidth
+                  variant="outlined"
+                  defaultValue={currentMovie.language ?? ""}
+                />
+                <Typography>
+                  <Link href={"https://imdb.com/title/" + currentMovie.imdb_id}>
+                    IMDB Page
+                  </Link>
+                </Typography>
+                {!isBlank(currentMovie.preview_link) ? (
+                  <ReactPlayer url={currentMovie.preview_link} />
+                ) : (
+                  <div />
+                )}
               </Box>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                fullWidth
-                variant="standard"
-                value={currentMovie.description ?? ""}
-              />
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                fullWidth
-                variant="standard"
-                value={currentMovie.preview_link ?? ""}
-              />
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Email Address"
-                type="email"
-                fullWidth
-                variant="standard"
-                value={currentMovie.language ?? ""}
-              />
-              <Typography>{currentMovie.imdb_rating}</Typography>
-              <Typography>{currentMovie.num_votes}</Typography>
-              <Typography>{currentMovie.release_year}</Typography>
-              <Typography>
-                <Link href={currentMovie.preview_link}>Preview</Link>
-              </Typography>
-              <Typography>
-                <Link href={"https://imdb.com/title/" + currentMovie.imdb_id}>
-                  IMDB
-                </Link>
-              </Typography>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleClose}>Subscribe</Button>
+              <Button form="MovieForm" type="submit">
+                {`${isSubmitting ? "Saving" : "Save"}`}
+              </Button>
             </DialogActions>
           </div>
         )}
       </Dialog>
     </Paper>
   );
+}
+function isBlank(str: any) {
+  return !str || /^\s*$/.test(str);
 }
