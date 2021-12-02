@@ -55,6 +55,10 @@ export const query = async (text: string | QueryConfig | QueryArrayConfig | any,
     console.log("executed query", { text, duration, rows: result.rowCount });
     return result
   } catch (e) {
+    if (!UNSAFE_PRINT_PARAMS && text.text) {
+      text = text.text;
+    }
+    console.log("Failed query", { text });
     console.error(e);
     throw e
   }

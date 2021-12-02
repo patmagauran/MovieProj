@@ -34,11 +34,9 @@ router.get("/userMovies", verifyUser, async (request: any, response: any) => {
       movies_list_mv.release_year,
       movies_list_mv.runtime,
       movies_list_mv.imdb_id,
-      (COUNT(friend_wants_to_see_moive.movie) > 0) as wants_to_see, 
-      (COUNT(friend_seen_movie.movie) > 0) as has_seen
+      (SELECT COUNT(friends_want_to_see_movies.movie) > 0 FROM friends_want_to_see_movies WHERE friends_want_to_see_movies.user = ${user.id} AND friends_want_to_see_movies.movie = movies_list_mv.id) as wants_to_see,
+      (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id) as has_seen
     FROM movies_list_mv
-    LEFT JOIN friend_wants_to_see_moive "user" = ${user.ID} AND movie = movies_list_mv.id
-    LEFT JOIN friend_seen_movie ON "user" = ${user.ID} AND movie = movies_list_mv.id
     WHERE english_title ILIKE ${searchText}
   LIMIT ${pageSize}
   OFFSET ${offset}`);
@@ -52,13 +50,13 @@ router.put("/seenMovie/:id", verifyUser, async (request: any, response: any) =>
   db.restQuery(response, sql`INSERT INTO friend_seen_movie ("user", movie) VALUES (${request.user.id}, ${request.params.id})`)
 );
 router.put("/wantSeeMovie/:id", verifyUser, async (request: any, response: any) =>
-  db.restQuery(response, sql`INSERT INTO friend_wants_to_see_moive ("user", movie) VALUES (${request.user.id}, ${request.params.id})`)
+  db.restQuery(response, sql`INSERT INTO friends_want_to_see_movies ("user", movie) VALUES (${request.user.id}, ${request.params.id})`)
 );
 router.delete("/seenMovie/:id", verifyUser, async (request: any, response: any) =>
   db.restQuery(response, sql`DELETE FROM friend_seen_movie WHERE "user" = ${request.user.id} and movie= ${request.params.id}`)
 );
 router.delete("/wantSeeMovie/:id", verifyUser, async (request: any, response: any) =>
-  db.restQuery(response, sql`DELETE FROM friend_seen_movie WHERE "user" = ${request.user.id} and movie= ${request.params.id}`)
+  db.restQuery(response, sql`DELETE FROM friends_want_to_see_movies WHERE "user" = ${request.user.id} and movie= ${request.params.id}`)
 );
 //GET
 router.get("/:id", async (request: any, response: any) =>

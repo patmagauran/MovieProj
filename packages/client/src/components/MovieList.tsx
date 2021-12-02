@@ -16,6 +16,7 @@ import {
   Box,
   Container,
   LinearProgress,
+  Link,
   Paper,
   Tooltip,
   Typography,
@@ -36,6 +37,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { UserContext } from "../contexts/UserContext";
+
 const initialRows: GridRowsProp = sampleData;
 
 const useStyles = makeStyles({
@@ -59,24 +62,7 @@ function CustomPagination() {
     />
   );
 }
-function loadServerRows(page: number, searchText?: string): Promise<any> {
-  return new Promise<any>((resolve) => {
-    axios
-      .get("http://localhost:8080/movies", {
-        params: {
-          page: page,
-          pageSize: 25,
-          searchText: searchText,
-        },
-      })
-      .then((response) => {
-        resolve(response.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
-}
+
 interface QuickSearchToolbarProps {
   clearSearch: () => void;
   onChange: () => void;
@@ -125,6 +111,30 @@ export default function MovieList() {
   const [open, setOpen] = React.useState(false);
   const [currentMovie, setCurrentMovie] = React.useState<movieType>({});
   const [movieLoading, setMovieLoading] = React.useState<boolean>(false);
+  const { userContext, setUserContext } = React.useContext(UserContext);
+
+  function loadServerRows(page: number, searchText?: string): Promise<any> {
+    return new Promise<any>((resolve) => {
+      axios
+        .get("http://localhost:8080/movies/userMovies", {
+          params: {
+            page: page,
+            pageSize: 25,
+            searchText: searchText,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userContext.token}`,
+          },
+        })
+        .then((response) => {
+          resolve(response.data.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+  }
   const handleClickOpen = (id: number) => {
     setMovieLoading(true);
     axios
@@ -194,20 +204,27 @@ export default function MovieList() {
     };
   }, [page]);
   const AddMovieToWatchlist = React.useCallback(
-    (id: GridRowId) => () => {
-      const alreadyWants = rows.find((row) => row.id == id)!.wants_to_see;
-      fetch("http://localhost:8080/" + "movies/seenMovie/" + id, {
+    (old_row: any) => () => {
+      const alreadyWants = old_row.wants_to_see;
+      fetch("http://localhost:8080/" + "movies/wantSeeMovie/" + old_row.id, {
         method: alreadyWants ? "DELETE" : "PUT",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userContext.token}`,
+        },
       })
         .then(async (response) => {
           if (!response.ok) {
+            console.log("error");
           } else {
-            setRows((prevRows) =>
-              prevRows.map((row) =>
-                row.id === id ? { ...row, WantToSee: !row.WantToSee } : row
-              )
-            );
+            setRows((prevRows) => {
+              return prevRows.map((row) => {
+                return row.id === old_row.id
+                  ? { ...row, wants_to_see: !row.wants_to_see }
+                  : row;
+              });
+            });
           }
         })
         .catch((error) => {});
@@ -216,25 +233,31 @@ export default function MovieList() {
   );
 
   const SeenMovie = React.useCallback(
-    (id: GridRowId) => () => {
-      const alreadySeen = rows.find((row) => row.id == id)!.has_seen;
-      fetch("http://localhost:8080/" + "movies/wantSeeMovie/" + id, {
+    (old_row: any) => () => {
+      const alreadySeen = old_row.has_seen;
+
+      fetch("http://localhost:8080/" + "movies/seenMovie/" + old_row.id, {
         method: alreadySeen ? "DELETE" : "PUT",
         credentials: "include",
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userContext.token}`,
+        },
       })
         .then(async (response) => {
           if (!response.ok) {
           } else {
             setRows((prevRows) =>
               prevRows.map((row) =>
-                row.id === id ? { ...row, HaveSeen: !row.HaveSeen } : row
+                row.id === old_row.id
+                  ? { ...row, has_seen: !row.has_seen }
+                  : row
               )
             );
           }
         })
         .catch((error) => {});
-
-      console.log(" I Have seen " + id);
     },
     []
   );
@@ -316,7 +339,7 @@ export default function MovieList() {
               />
             }
             label="Delete"
-            onClick={AddMovieToWatchlist(params.id)}
+            onClick={AddMovieToWatchlist(params.row)}
           />,
           <GridActionsCellItem
             icon={
@@ -325,7 +348,7 @@ export default function MovieList() {
               />
             }
             label="Toggle Admin"
-            onClick={SeenMovie(params.id)}
+            onClick={SeenMovie(params.row)}
           />,
         ],
       },
@@ -386,7 +409,7 @@ export default function MovieList() {
                   }}
                 >
                   <img src={currentMovie.poster_link} />
-                  <TextField value={currentMovie.poster_link} />
+                  <TextField value={currentMovie.poster_link ?? ""} />
                 </Box>
               </Box>
               <TextField
@@ -397,7 +420,7 @@ export default function MovieList() {
                 type="email"
                 fullWidth
                 variant="standard"
-                value={currentMovie.description}
+                value={currentMovie.description ?? ""}
               />
               <TextField
                 autoFocus
@@ -407,7 +430,7 @@ export default function MovieList() {
                 type="email"
                 fullWidth
                 variant="standard"
-                value={currentMovie.preview_link}
+                value={currentMovie.preview_link ?? ""}
               />
               <TextField
                 autoFocus
@@ -417,18 +440,18 @@ export default function MovieList() {
                 type="email"
                 fullWidth
                 variant="standard"
-                value={currentMovie.language}
+                value={currentMovie.language ?? ""}
               />
               <Typography>{currentMovie.imdb_rating}</Typography>
               <Typography>{currentMovie.num_votes}</Typography>
               <Typography>{currentMovie.release_year}</Typography>
               <Typography>
-                <a href={currentMovie.preview_link} />
-                Preview
+                <Link href={currentMovie.preview_link}>Preview</Link>
               </Typography>
               <Typography>
-                <a href={"https://imdb.com/title/" + currentMovie.imdb_id} />
-                IMDB
+                <Link href={"https://imdb.com/title/" + currentMovie.imdb_id}>
+                  IMDB
+                </Link>
               </Typography>
             </DialogContent>
             <DialogActions>
