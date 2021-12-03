@@ -21,6 +21,7 @@ import {
   Tooltip,
   Alert,
   Typography,
+  Snackbar,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useGridApiContext, useGridState } from "@mui/x-data-grid";
@@ -43,6 +44,7 @@ import { useImage } from "react-image";
 import ReactPlayer from "react-player";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import CloseIcon from "@mui/icons-material/Close";
 const initialRows: GridRowsProp = sampleData;
 
 const useStyles = makeStyles({
@@ -143,6 +145,25 @@ export default function MovieList({
   const { userContext, setUserContext } = React.useContext(UserContext);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+
+  const handleSnackbarOpen = () => {
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackbarOpen(false);
+    setSnackbarMessage("");
+  };
 
   const handleClickOpen = (id: number) => {
     setMovieLoading(true);
@@ -249,6 +270,8 @@ export default function MovieList({
           (old_row.has_seen_liked && dislike) ||
           (old_row.has_seen_disliked && !dislike);
         if (alreadyChecked) {
+          setSnackbarOpen(true);
+          setSnackbarMessage("You can't both Like & Dislike a movie!");
         } else {
           fetch("http://localhost:8080/" + "movies/seenMovie/" + old_row.id, {
             method: alreadySeen ? "DELETE" : "PUT",
@@ -279,6 +302,18 @@ export default function MovieList({
         }
       },
     []
+  );
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleSnackbarClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
   );
 
   const columns = React.useMemo(
@@ -350,7 +385,7 @@ export default function MovieList({
       {
         field: "actions",
         type: "actions",
-        width: 80,
+        width: 100,
         getActions: (params: GridRowParams) => [
           <GridActionsCellItem
             icon={
@@ -463,6 +498,13 @@ export default function MovieList({
           />
         </div>
       </div>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        action={action}
+      />
       <Dialog open={open} onClose={handleClose} fullWidth={true} maxWidth="lg">
         {movieLoading ? (
           <LinearProgress />

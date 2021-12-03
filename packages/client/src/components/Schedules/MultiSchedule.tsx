@@ -42,7 +42,7 @@ interface IUser {
 }
 export default function Schedule() {
   const { userContext, setUserContext } = React.useContext(UserContext);
-  const [users, setUsers] = React.useState<IUser[]>([]);
+  const [users, setUsers] = React.useState<{ [key: number]: string }>({});
   const calendarRef = React.createRef<FullCalendar>();
   const [selectedUser, setSelectedUser] = React.useState<string[]>([]);
   const loadUsers = async () => {
@@ -55,7 +55,11 @@ export default function Schedule() {
           },
         })
         .then((response) => {
-          resolve(response.data.data);
+          let usrTemp: { [key: number]: string } = {};
+          response.data.data.forEach((usr: IUser) => {
+            usrTemp[usr.id] = usr.full_name;
+          });
+          resolve(usrTemp);
         })
         .catch((err) => {
           console.log(err);
@@ -78,7 +82,7 @@ export default function Schedule() {
     return () => {
       active = false;
     };
-  }, [loadUsers]);
+  }, []);
 
   const handleChange = (event: SelectChangeEvent<typeof selectedUser>) => {
     const {
@@ -89,7 +93,7 @@ export default function Schedule() {
       typeof value === "string" ? value.split(",") : value
     );
     if (calendarRef != null && calendarRef.current != null) {
-      calendarRef.current.getApi().refetchEvents();
+      // calendarRef.current.getApi().refetchEvents();
     }
   };
   const getEventFeed = (
@@ -97,14 +101,17 @@ export default function Schedule() {
     successCallback: (arg0: any) => any,
     failureCallback: (arg0: any) => any
   ): void => {
+    let selection: number[] = selectedUser.map((usr: string) => Number(usr));
     fetch("http://localhost:8080/" + "users/allSchedules", {
-      method: "GET",
+      method: "POST",
       credentials: "include",
-      // Pass authentication token as bearer token in header
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${userContext.token}`,
       },
+      body: JSON.stringify({
+        users: selection,
+      }),
     })
       .then(async (response) => {
         const data = await response.json();
@@ -126,7 +133,10 @@ export default function Schedule() {
   };
 
   return (
-    <Paper sx={{ height: "100%" }} elevation={1}>
+    <Paper
+      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+      elevation={1}
+    >
       <FormControl sx={{ m: 1, width: 300 }}>
         <InputLabel id="demo-multiple-chip-label">Chip</InputLabel>
         <Select
@@ -138,57 +148,53 @@ export default function Schedule() {
           input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
+              {selected.map((value: any) => (
+                <Chip key={value} label={users[Number(value)]} />
               ))}
             </Box>
           )}
           MenuProps={MenuProps}
         >
-          {users.map(
-            (user: { [key: string]: any; id: number; full_name: string }) => (
-              <MenuItem
-                key={user.id}
-                value={user.id}
-                //   style={getStyles(name, personName, theme)}
-              >
-                {user.full_name}
-              </MenuItem>
-            )
-          )}
+          {Object.keys(users).map((id: any) => (
+            <MenuItem key={id} value={id}>
+              {users[Number(id)]}
+            </MenuItem>
+          ))}
         </Select>
       </FormControl>
-      <div style={{ display: "flex", height: "100%" }}>
-        <div style={{ flexGrow: 1 }}>
-          <FullCalendar
-            ref={calendarRef}
-            height="100%"
-            plugins={[timeGridPlugin, interactionPlugin]}
-            headerToolbar={false}
-            initialDate={new Date(2021, 10, 18)}
-            nowIndicator={false}
-            longPressDelay={400}
-            views={{
-              timeGridWeek: {
-                // name of view
-                allDaySlot: false,
-                nowIndicator: false,
-                expandRows: true,
-                dayHeaderFormat: { weekday: "short" },
-                // other view-specific options here
-              },
-            }}
-            initialView="timeGridWeek"
-            editable={false}
-            selectable={false}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={true}
-            events={getEventFeed} // alternatively, use the `events` setting to fetch from a feed
-            eventContent={renderEventContent} // custom render function
-          />
+      <Box sx={{ height: "100%" }}>
+        <div style={{ display: "flex", height: "100%" }}>
+          <div style={{ flexGrow: 1 }}>
+            <FullCalendar
+              ref={calendarRef}
+              height="100%"
+              plugins={[timeGridPlugin, interactionPlugin]}
+              headerToolbar={false}
+              initialDate={new Date(2021, 10, 18)}
+              nowIndicator={false}
+              longPressDelay={400}
+              views={{
+                timeGridWeek: {
+                  // name of view
+                  allDaySlot: false,
+                  nowIndicator: false,
+                  expandRows: true,
+                  dayHeaderFormat: { weekday: "short" },
+                  // other view-specific options here
+                },
+              }}
+              initialView="timeGridWeek"
+              editable={false}
+              selectable={false}
+              selectMirror={true}
+              dayMaxEvents={true}
+              weekends={true}
+              events={getEventFeed} // alternatively, use the `events` setting to fetch from a feed
+              eventContent={renderEventContent} // custom render function
+            />
+          </div>
         </div>
-      </div>
+      </Box>
     </Paper>
   );
 }
@@ -196,7 +202,7 @@ export default function Schedule() {
 function renderEventContent(eventContent: EventContentArg) {
   return (
     <>
-      <b>{eventContent.title}</b>
+      <b>{eventContent.event.title}</b>
 
       <b>{eventContent.timeText}</b>
     </>

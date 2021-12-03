@@ -30,14 +30,15 @@ router.post("/me", verifyUser, async (request: any, response: any) =>
   )
 );
 
-router.get("/allSchedules", verifyUser, async (request, response, next) => {
+router.post("/allSchedules", verifyUser, async (request, response, next) => {
   let user = request.user;
-
+  let users = request.body.users;
   //let whereClause = searchText ? sql`  WHERE english_title ILIKE '%${searchText}%'` : sql``
 
   db.restQuery(response, sql`SELECT 
       lower(time_range) as start_time, upper(time_range) as end_time, id, username, (first_name || ' ' || last_name) as full_name  FROM user_available
       JOIN users ON user_available.user_id = id
+      WHERE id = ANY (${users})
 `);
 })
 

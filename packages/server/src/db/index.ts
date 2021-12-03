@@ -71,6 +71,7 @@ export const restQuery = async (response: any, text: any, params?: any) => {
       data: rows
     });
   } catch (err) {
+
     response.status(503).json({ message: "Internal Server Error" });
   }
 };
