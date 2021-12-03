@@ -250,14 +250,14 @@ async function insertCastAndCrew(client: PoolClient) {
   await client.query(
     sql`
      WITH temp_cast_characters AS (
-      SELECT tconst, nconst,
+      SELECT tconst, nconst, category,
 	      trim(both '" ' from string_to_table(
 		      trim(both '[]' from "characters"), ',')
         ) as character_name
 	    FROM import_temp WHERE category IN ('self', 'actress', 'actor')
       )
-    INSERT INTO ACTORS_IN_MOVIE (PERSON,MOVIE, CHARACTER_NAME)
-      (SELECT people.id, movies.id, temp_cast_characters.character_name
+    INSERT INTO ACTORS_IN_MOVIE (PERSON,MOVIE, CHARACTER_NAME, category)
+      (SELECT people.id, movies.id, temp_cast_characters.character_name, temp_cast_characters.category
         FROM movies
         INNER JOIN temp_cast_characters
           ON temp_cast_characters.tconst = movies.imdb_id
@@ -269,11 +269,11 @@ async function insertCastAndCrew(client: PoolClient) {
   await client.query(
     sql`
     WITH temp_cast_characters AS (
-      SELECT tconst, nconst, COALESCE(job, category) as crew_role
+      SELECT tconst, nconst, COALESCE(job, category) as crew_role, category
 	    FROM import_temp WHERE category NOT IN ('self', 'actress', 'actor')
       )
-    INSERT INTO crew_in_movie (PERSON,MOVIE, "role")
-      (SELECT people.id, movies.id, temp_cast_characters.crew_role
+    INSERT INTO crew_in_movie (PERSON,MOVIE, "role", category)
+      (SELECT people.id, movies.id, temp_cast_characters.crew_role, temp_cast_characters.category
         FROM movies
         INNER JOIN temp_cast_characters
           ON temp_cast_characters.tconst = movies.imdb_id
@@ -298,9 +298,9 @@ router.get("/import", async (request: any, response: any) => {
     console.log("Running Import");
     await client.query("BEGIN");
     // await insertMovies(client);
-    await addRatings(client);
+    //await addRatings(client);
     // await insertPeople(client);
-    // await insertCastAndCrew(client);
+    await insertCastAndCrew(client);
 
     console.log("Done");
     const duration = Date.now() - start;
