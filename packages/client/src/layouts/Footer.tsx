@@ -37,7 +37,7 @@ const Footer = () => {
     >
       <BottomNavigation showLabels value={match}>
         <BottomNavigationAction
-          label="Recommendations"
+          label="Group Watchlist"
           icon={<LocalMoviesIcon />}
           component={RouterLink}
           to="/recommend"

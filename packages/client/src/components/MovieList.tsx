@@ -26,7 +26,6 @@ import {
 import { makeStyles } from "@mui/styles";
 import { useGridApiContext, useGridState } from "@mui/x-data-grid";
 import Pagination from "@mui/material/Pagination";
-import sampleData from "./sampleData";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import ThumbsUpDownIcon from "@mui/icons-material/ThumbsUpDown";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -45,7 +44,6 @@ import ReactPlayer from "react-player";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import CloseIcon from "@mui/icons-material/Close";
-const initialRows: GridRowsProp = sampleData;
 
 const useStyles = makeStyles({
   root: {

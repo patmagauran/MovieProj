@@ -36,7 +36,7 @@ export default function SignIn() {
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: data.get("email"),
+        username: data.get("username"),
         password: data.get("password"),
       }),
     })
@@ -61,16 +61,6 @@ export default function SignIn() {
         setIsSubmitting(false);
         setError(genericErrorMessage);
       });
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
   };
 
   return (
@@ -100,10 +90,10 @@ export default function SignIn() {
           margin="normal"
           required
           fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
+          id="username"
+          label="Username"
+          name="username"
+          autoComplete="username"
           autoFocus
         />
         <TextField
@@ -116,10 +106,6 @@ export default function SignIn() {
           id="password"
           autoComplete="current-password"
         />
-        <FormControlLabel
-          control={<Checkbox value="remember" color="primary" />}
-          label="Remember me"
-        />
         <Button
           type="submit"
           fullWidth
@@ -129,18 +115,6 @@ export default function SignIn() {
         >
           {`${isSubmitting ? "Signing In" : "Sign In"}`}
         </Button>
-        <Grid container>
-          <Grid item xs>
-            <Link href="#" variant="body2">
-              Forgot password?
-            </Link>
-          </Grid>
-          <Grid item>
-            <Link href="#" variant="body2">
-              {"Don't have an account? Sign Up"}
-            </Link>
-          </Grid>
-        </Grid>
       </Box>
     </Box>
   );

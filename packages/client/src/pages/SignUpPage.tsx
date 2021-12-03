@@ -41,7 +41,8 @@ export default function SignIn() {
       body: JSON.stringify({
         first_name: data.get("firstName"),
         last_name: data.get("lastName"),
-        username: data.get("email"),
+        email: data.get("email"),
+        username: data.get("username"),
         password: data.get("password"),
       }),
     })
@@ -70,16 +71,6 @@ export default function SignIn() {
         setIsSubmitting(false);
         setError(genericErrorMessage);
       });
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
   };
 
   return (
@@ -141,17 +132,21 @@ export default function SignIn() {
             <TextField
               required
               fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
               name="password"
               label="Password"
               type="password"
               id="password"
               autoComplete="new-password"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive inspiration, marketing promotions and updates via email."
             />
           </Grid>
         </Grid>
@@ -164,13 +159,6 @@ export default function SignIn() {
         >
           {`${isSubmitting ? "Signing Up" : "Sign Up"}`}
         </Button>
-        <Grid container justifyContent="flex-end">
-          <Grid item>
-            <Link href="#" variant="body2">
-              Already have an account? Sign in
-            </Link>
-          </Grid>
-        </Grid>
       </Box>
     </Box>
   );

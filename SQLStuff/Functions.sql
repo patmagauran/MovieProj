@@ -1,40 +1,3 @@
---
--- Name: get_combinations(anyarray)
--- Purpose: Gets the powerset of the array inputted
--- Used to get all combinations of users
--- Taken from: https://stackoverflow.com/a/26560615
---
-
-CREATE FUNCTION public.get_combinations(source anyarray) RETURNS SETOF anyarray
-    LANGUAGE sql
-    AS $$
- with recursive combinations(combination, indices) as (
-   select source[i:i], array[i] from generate_subscripts(source, 1) i
-   union all
-   select c.combination || source[j], c.indices || j
-   from   combinations c, generate_subscripts(source, 1) j
-   where  j > all(c.indices) )
- select combination from combinations
-$$;
-
---
--- Name: get_compatible_times(integer[])
--- Purpose: Gets the times and duration a set of users are available together in
---
-
-CREATE FUNCTION public.get_compatible_times(filter_ids integer[]) 
-    RETURNS TABLE(time_range tstzrange, duration interval)
-    LANGUAGE sql
-    AS 
-    $$
-        SELECT range_time, (upper(range_time) - lower(range_time)) as duration 
-        FROM 
-        (--Get the users individal availabilities
-            SELECT unnest(range_agg(overlap_times)) as range_time 
-            FROM actual_overlaps 
-            WHERE user_ids @> filter_ids
-        ) s
-    $$;
 
 
 --
@@ -48,6 +11,7 @@ CREATE FUNCTION public.update_combos_view_trigger() RETURNS trigger
     $$
         BEGIN
             REFRESH MATERIALIZED VIEW combination_overlaps;
+            RETURN new;
         END;
     $$;
 

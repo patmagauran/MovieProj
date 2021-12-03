@@ -77,29 +77,6 @@ CREATE MATERIALIZED VIEW movies_list_mv AS
 
 CREATE INDEX movies_list_mv_idx ON movies_list_mv USING btree (num_votes DESC NULLS LAST, english_title);
 
-
---
--- Name: combination_overlaps
--- Purpose: This returns every timeslot people can watch a movie in.
--- That way you can search for the overlaps for users 1, 4, 6 and get just that.
--- NOTE: This is dependent on the actual_overlaps view below. 
--- It can be made with no data and then refreshed later with REFRESH MATERIALIZED VIEW combination_overlaps
---
-
-CREATE MATERIALIZED VIEW combination_overlaps AS
- SELECT times.time_range,
-    times.duration,
-    combos.cmb
-   FROM 
-   ( -- Get the overlaps for each combination
-      ( -- Get all combinations of users(power set)
-         SELECT get_combinations(array_agg(users.id)) AS cmb
-         FROM users
-      ) combos
-      JOIN LATERAL get_compatible_times(combos.cmb) times(time_range, duration) ON (true)
-   )
-  WITH NO DATA;
-
 --
 -- Name: user_available_multiranges
 -- Purpose: Returns a multirange for each user of when that user is available.
@@ -110,7 +87,6 @@ CREATE VIEW user_available_multiranges AS
     user_available.user_id
    FROM user_available
   GROUP BY user_available.user_id;
-
 
 --
 -- Name: actual_overlaps
@@ -150,7 +126,7 @@ CREATE VIEW actual_overlaps AS
          (
             (
                SELECT time_set.start_time,
-                     row_number() OVER () AS rnum
+                     row_number() OVER () AS rnum --Window function. Allows access to row number and other utils
                FROM time_set
             ) start_times
             JOIN 
@@ -170,6 +146,72 @@ CREATE VIEW actual_overlaps AS
    )
    GROUP BY (user_available_multiranges.available_times * multirange(time_pairs.time_range)) -- Avoid duplicate times
    ORDER BY (unnest((user_available_multiranges.available_times * multirange(time_pairs.time_range)))); -- Sort from start to end
+
+
+--
+-- Name: get_combinations(anyarray)
+-- Purpose: Gets the powerset of the array inputted
+-- Used to get all combinations of users
+-- Taken from: https://stackoverflow.com/a/26560615
+--
+
+CREATE FUNCTION public.get_combinations(source anyarray) RETURNS SETOF anyarray
+    LANGUAGE sql
+    AS $$
+ with recursive combinations(combination, indices) as (
+   select source[i:i], array[i] from generate_subscripts(source, 1) i
+   union all
+   select c.combination || source[j], c.indices || j
+   from   combinations c, generate_subscripts(source, 1) j
+   where  j > all(c.indices) )
+ select combination from combinations
+$$;
+
+--
+-- Name: get_compatible_times(integer[])
+-- Purpose: Gets the times and duration a set of users are available together in
+--
+
+CREATE FUNCTION public.get_compatible_times(filter_ids integer[]) 
+    RETURNS TABLE(time_range tstzrange, duration interval)
+    LANGUAGE sql
+    AS 
+    $$
+        SELECT range_time, (upper(range_time) - lower(range_time)) as duration 
+        FROM 
+        (--Get the users individal availabilities
+            SELECT unnest(range_agg(overlap_times)) as range_time 
+            FROM actual_overlaps 
+            WHERE user_ids @> filter_ids
+        ) s
+    $$;
+
+
+--
+-- Name: combination_overlaps
+-- Purpose: This returns every timeslot people can watch a movie in.
+-- That way you can search for the overlaps for users 1, 4, 6 and get just that.
+-- NOTE: This is dependent on the actual_overlaps view below. 
+-- It can be made with no data and then refreshed later with REFRESH MATERIALIZED VIEW combination_overlaps
+--
+
+CREATE MATERIALIZED VIEW combination_overlaps AS
+ SELECT times.time_range,
+    times.duration,
+    combos.cmb
+   FROM 
+   ( -- Get the overlaps for each combination
+      ( -- Get all combinations of users(power set)
+         SELECT get_combinations(array_agg(users.id)) AS cmb
+         FROM users
+      ) combos
+      JOIN LATERAL get_compatible_times(combos.cmb) times(time_range, duration) ON (true)
+   )
+  WITH NO DATA;
+
+
+
+
 
 --
 -- Name: movies_list

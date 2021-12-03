@@ -3,7 +3,6 @@
 -- Purpose: Would Store a list of languages that a movie could be primarily in. 
 -- Not currently implemented fully as IMDB does not export this data as I thought they did.
 --
-
 CREATE TABLE languages (
     id SERIAL NOT NULL PRIMARY KEY,
     language character varying NOT NULL UNIQUE
@@ -17,15 +16,15 @@ CREATE TABLE languages (
 CREATE TABLE movies (
     id SERIAL NOT NULL PRIMARY KEY,
     english_title character varying NOT NULL,
-    imdb_rating numeric,
+    imdb_rating numeric CHECK (imdb_rating BETWEEN 0 AND 10),
     release_year date,
-    runtime numeric,
-    imdb_id character varying UNIQUE,
+    runtime numeric CHECK (runtime IS NULL OR runtime >= 0),
+    imdb_id character varying UNIQUE CHECK (imdb_id like 'tt%'),
     preview_link character varying,
     language integer REFERENCES languages(id),
     see_score integer, --DEPRECATED
-    title_type character varying, --The type of the title: short, movie, tvseries, video
-    num_votes integer, -- how many imdb votes doe sit have
+    title_type character varying CHECK (title_type IN ('short', 'movie', 'tvseries', 'video')), --The type of the title: short, movie, tvseries, video
+    num_votes integer CHECK (num_votes IS NULL OR num_votes >= 0), -- how many imdb votes doe sit have
     tmdb_updated boolean DEFAULT false NOT NULL, --Marks if the fields were externaly updated. Would be used to prevent needlees automatic refetching
     description text,
     poster_link character varying
@@ -100,7 +99,7 @@ CREATE TABLE actors_in_movie (
     person integer NOT NULL REFERENCES people(id),
     movie integer NOT NULL REFERENCES movies(id),
     character_name character varying,
-    category character varying,
+    category character varying CHECK (category IN ('actor', 'actress', 'self')),
     PRIMARY KEY (person, movie)
 );
 

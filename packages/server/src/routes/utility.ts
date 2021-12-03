@@ -297,11 +297,13 @@ router.get("/import", async (request: any, response: any) => {
 
     console.log("Running Import");
     await client.query("BEGIN");
-    // await insertMovies(client);
-    //await addRatings(client);
-    // await insertPeople(client);
+    await insertMovies(client);
+    await addRatings(client);
+    await insertPeople(client);
     await insertCastAndCrew(client);
-
+    await client.query("REFRESH MATERIALIZED VIEW people_movies_mv");
+    await client.query("REFRESH MATERIALIZED VIEW movies_list_mv");
+    await client.query("COMMIT");
     console.log("Done");
     const duration = Date.now() - start;
     console.log("Operation took: " + duration / 1000 + "s");

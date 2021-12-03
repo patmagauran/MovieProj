@@ -59,9 +59,27 @@ router.get("/userMoviesToSee", verifyUser, async (request: any, response: any) =
       movies_to_see.runtime,
       movies_to_see.imdb_id,
       movies_to_see.max_can_see,
-      (SELECT COUNT(friends_want_to_see_movies.movie) > 0 FROM friends_want_to_see_movies WHERE friends_want_to_see_movies.user = ${user.id} AND friends_want_to_see_movies.movie = movies_to_see.id) as wants_to_see,
-      (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_to_see.id AND friend_seen_movie.see_again) as has_seen_liked,
-            (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_to_see.id AND (NOT friend_seen_movie.see_again)) as has_seen_disliked
+      ( --Who wants to see it
+        SELECT COUNT(friends_want_to_see_movies.movie) > 0 
+        FROM friends_want_to_see_movies 
+        WHERE friends_want_to_see_movies.user = ${user.id} 
+              AND friends_want_to_see_movies.movie = movies_to_see.id
+      ) as wants_to_see,
+      ( --Who has liked it
+        SELECT COUNT(friend_seen_movie.movie) > 0 
+        FROM friend_seen_movie 
+        WHERE friend_seen_movie.user = ${user.id} 
+              AND friend_seen_movie.movie = movies_to_see.id 
+              AND friend_seen_movie.see_again
+      ) as has_seen_liked,
+      ( --Who has disliked
+        SELECT COUNT(friend_seen_movie.movie) > 0 
+        FROM friend_seen_movie 
+        WHERE friend_seen_movie.user = ${user.id} 
+              AND friend_seen_movie.movie = movies_to_see.id 
+              AND (NOT friend_seen_movie.see_again)
+      )
+      as has_seen_disliked
     FROM movies_to_see
     WHERE english_title ILIKE ${searchText}
   LIMIT ${pageSize}
