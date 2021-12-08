@@ -34,6 +34,10 @@ router.get("/userMovies", verifyUser, async (request: any, response: any) => {
       movies_list_mv.release_year,
       movies_list_mv.runtime,
       movies_list_mv.imdb_id,
+          ( SELECT string_agg(genre.genre_name::text, ', '::text) AS string_agg
+           FROM movie_genres
+             LEFT JOIN genre ON movie_genres.genre = genre.id
+          WHERE movies_list_mv.id = movie_genres.movie) AS genres,
       (SELECT COUNT(friends_want_to_see_movies.movie) > 0 FROM friends_want_to_see_movies WHERE friends_want_to_see_movies.user = ${user.id} AND friends_want_to_see_movies.movie = movies_list_mv.id) as wants_to_see,
       (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id AND friend_seen_movie.see_again) as has_seen_liked,
             (SELECT COUNT(friend_seen_movie.movie) > 0 FROM friend_seen_movie WHERE friend_seen_movie.user = ${user.id} AND friend_seen_movie.movie = movies_list_mv.id AND (NOT friend_seen_movie.see_again)) as has_seen_disliked
@@ -59,6 +63,7 @@ router.get("/userMoviesToSee", verifyUser, async (request: any, response: any) =
       movies_to_see.runtime,
       movies_to_see.imdb_id,
       movies_to_see.max_can_see,
+      movies_to_see.genres,
       ( --Who wants to see it
         SELECT COUNT(friends_want_to_see_movies.movie) > 0 
         FROM friends_want_to_see_movies 
